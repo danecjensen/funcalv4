@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-lg-4 mb-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <%= render "shared/avatar", user: @user, size: 120 %>
+        <h3 class="mt-3 mb-1"><%= @user.display_name %></h3>
+        <p class="text-muted">
+          Member since <%= @user.created_at.strftime("%B %Y") %>
+        </p>
+        <% if @user.bio.present? %>
+          <p class="mb-3"><%= @user.bio %></p>
+        <% end %>
+        <% if policy(@user).edit? %>
+          <%= link_to "Edit Profile", edit_user_path(@user), class: "btn btn-outline-primary btn-sm" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">Stats</div>
+      <div class="card-body">
+        <div class="d-flex justify-content-around text-center">
+          <div>
+            <h4 class="mb-0"><%= @user.posts.count %></h4>
+            <small class="text-muted">Posts</small>
+          </div>
+          <div>
+            <h4 class="mb-0"><%= @user.comments.count %></h4>
+            <small class="text-muted">Comments</small>
+          </div>
+          <div>
+            <h4 class="mb-0"><%= @user.posts.with_events.count %></h4>
+            <small class="text-muted">Events</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <h4 class="mb-3">Posts by <%= @user.display_name %></h4>
+
+    <% if @posts.any? %>
+      <div id="posts">
+        <%= render @posts %>
+      </div>
+    <% else %>
+      <div class="text-center text-muted py-5">
+        <p>No posts yet.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

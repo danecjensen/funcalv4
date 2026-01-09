@@ -1,0 +1,51 @@
+<div class="row">
+  <div class="col-lg-8">
+    <h1 class="mb-4">Timeline</h1>
+
+    <% if user_signed_in? %>
+      <%= turbo_frame_tag "new_post" do %>
+        <div class="card mb-4">
+          <div class="card-body">
+            <%= render "posts/form", post: @post %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div id="posts">
+      <%= render @posts %>
+    </div>
+
+    <% if @posts.empty? %>
+      <div class="text-center text-muted py-5">
+        <p>No posts yet. Be the first to share something!</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Upcoming Events</h5>
+      </div>
+      <div class="card-body">
+        <% upcoming_events = Event.includes(post: :creator).upcoming.limit(5) %>
+        <% if upcoming_events.any? %>
+          <ul class="list-unstyled mb-0">
+            <% upcoming_events.each do |event| %>
+              <li class="mb-3">
+                <strong><%= event.title %></strong><br>
+                <small class="text-muted">
+                  <i class="bi bi-calendar-event"></i>
+                  <%= event.starts_at.strftime("%b %d, %Y at %l:%M %p") %>
+                </small>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-muted mb-0">No upcoming events.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

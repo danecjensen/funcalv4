@@ -1,0 +1,67 @@
+<%= turbo_frame_tag "event-details" do %>
+  <div class="event-detail">
+    <h3 class="mb-3"><%= @event.title %></h3>
+
+    <div class="event-meta mb-4">
+      <p class="mb-2">
+        <i class="bi bi-calendar-event text-primary"></i>
+        <strong>When:</strong>
+        <%= @event.starts_at.strftime("%A, %B %d, %Y at %l:%M %p") %>
+        <% if @event.ends_at.present? %>
+          - <%= @event.ends_at.strftime("%l:%M %p") %>
+        <% end %>
+        <% if @event.all_day? %>
+          <span class="badge bg-secondary">All Day</span>
+        <% end %>
+      </p>
+      <% if @event.location.present? %>
+        <p class="mb-2">
+          <i class="bi bi-geo-alt text-primary"></i>
+          <strong>Where:</strong> <%= @event.location %>
+        </p>
+      <% end %>
+      <p class="mb-0">
+        <i class="bi bi-person text-primary"></i>
+        <strong>Posted by:</strong>
+        <%= link_to @event.post.creator.display_name, user_path(@event.post.creator) %>
+      </p>
+    </div>
+
+    <hr>
+
+    <h5 class="mb-3">About this Event</h5>
+    <div class="card mb-4">
+      <div class="card-body">
+        <%= @event.post.body %>
+      </div>
+    </div>
+
+    <h5 class="mb-3">Discussion (<%= @event.post.comments_count %>)</h5>
+    <% if @event.post.comments.any? %>
+      <div class="comments-preview mb-3">
+        <% @event.post.comments.includes(:creator).recent.limit(5).each do |comment| %>
+          <div class="d-flex mb-2">
+            <%= render "shared/avatar", user: comment.creator, size: 28 %>
+            <div class="ms-2 bg-light rounded p-2 flex-grow-1">
+              <strong><%= comment.creator.display_name %></strong>
+              <small class="text-muted"><%= time_ago_in_words(comment.created_at) %> ago</small>
+              <div><%= comment.body %></div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @event.post.comments.count > 5 %>
+          <p class="text-muted">
+            And <%= @event.post.comments.count - 5 %> more comments...
+          </p>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted">No comments yet.</p>
+    <% end %>
+
+    <div class="mt-4">
+      <%= link_to "View Full Post on Timeline", post_path(@event.post), class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

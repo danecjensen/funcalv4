@@ -1,0 +1,8 @@
+<%= turbo_stream.prepend "posts", @post %>
+<%= turbo_stream.replace "new_post" do %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <%= render "posts/form", post: Post.new.tap { |p| p.build_event } %>
+    </div>
+  </div>
+<% end %>

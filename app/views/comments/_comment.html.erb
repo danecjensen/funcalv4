@@ -1,0 +1,19 @@
+<div class="comment d-flex mb-2 pt-2" id="<%= dom_id(comment) %>">
+  <%= render "shared/avatar", user: comment.creator, size: 32 %>
+  <div class="ms-2 flex-grow-1">
+    <div class="bg-light rounded p-2">
+      <strong><%= comment.creator.display_name %></strong>
+      <small class="text-muted">
+        <%= time_ago_in_words(comment.created_at) %> ago
+      </small>
+      <div class="comment-body">
+        <%= comment.body %>
+      </div>
+    </div>
+    <% if policy(comment).destroy? %>
+      <%= link_to "Delete", post_comment_path(comment.post, comment),
+          data: { turbo_method: :delete, turbo_confirm: "Delete this comment?" },
+          class: "text-danger small" %>
+    <% end %>
+  </div>
+</div>

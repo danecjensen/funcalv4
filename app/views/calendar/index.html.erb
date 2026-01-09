@@ -1,0 +1,26 @@
+<h1 class="mb-4">Community Calendar</h1>
+
+<div data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json) %>">
+  <div data-calendar-target="calendar" class="calendar-container"></div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Event Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <%= turbo_frame_tag "event-details" do %>
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

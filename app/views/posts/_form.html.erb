@@ -1,0 +1,59 @@
+<%= form_with model: post, data: { controller: "post-form" } do |f| %>
+  <% if post.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.rich_text_area :body, class: "form-control", placeholder: "What's happening in the community?" %>
+  </div>
+
+  <div class="mb-3">
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="click->post-form#toggleEvent">
+      <i class="bi bi-calendar-plus"></i> Add Event Details
+    </button>
+  </div>
+
+  <div class="event-fields" data-post-form-target="eventFields" style="display: none;">
+    <div class="card bg-light mb-3">
+      <div class="card-body">
+        <h6 class="card-title">Event Details</h6>
+        <%= f.fields_for :event, post.event || post.build_event do |ef| %>
+          <div class="row">
+            <div class="col-12 mb-3">
+              <%= ef.label :title, class: "form-label" %>
+              <%= ef.text_field :title, class: "form-control", placeholder: "Event title" %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= ef.label :starts_at, "Start Date/Time", class: "form-label" %>
+              <%= ef.datetime_local_field :starts_at, class: "form-control" %>
+            </div>
+            <div class="col-md-6 mb-3">
+              <%= ef.label :ends_at, "End Date/Time", class: "form-label" %>
+              <%= ef.datetime_local_field :ends_at, class: "form-control" %>
+            </div>
+            <div class="col-md-8 mb-3">
+              <%= ef.label :location, class: "form-label" %>
+              <%= ef.text_field :location, class: "form-control", placeholder: "Location (optional)" %>
+            </div>
+            <div class="col-md-4 mb-3 d-flex align-items-end">
+              <div class="form-check">
+                <%= ef.check_box :all_day, class: "form-check-input" %>
+                <%= ef.label :all_day, "All day event", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end">
+    <%= f.submit post.persisted? ? "Update Post" : "Post", class: "btn btn-primary" %>
+  </div>
+<% end %>

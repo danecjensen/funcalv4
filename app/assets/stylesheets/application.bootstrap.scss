@@ -1,0 +1,44 @@
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+@import 'actiontext.css';
+
+// FullCalendar styling
+.calendar-container {
+  min-height: 600px;
+}
+
+.fc {
+  --fc-border-color: #dee2e6;
+  --fc-button-bg-color: #0d6efd;
+  --fc-button-border-color: #0d6efd;
+  --fc-button-hover-bg-color: #0b5ed7;
+  --fc-button-hover-border-color: #0a58ca;
+  --fc-button-active-bg-color: #0a58ca;
+  --fc-button-active-border-color: #0a53be;
+  --fc-event-bg-color: #0d6efd;
+  --fc-event-border-color: #0d6efd;
+  --fc-today-bg-color: rgba(13, 110, 253, 0.1);
+}
+
+.fc .fc-button {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.25rem;
+}
+
+// Trix editor styling
+trix-editor {
+  min-height: 100px;
+}
+
+.trix-content {
+  min-height: 100px;
+}
+
+// Comment form trix
+.comment-form trix-editor {
+  min-height: 60px;
+}

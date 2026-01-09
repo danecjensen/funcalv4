@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #c17854;
+            --color-primary-dark: #a66344;
+            --color-secondary: #7ba882;
+            --color-accent: #d4a574;
+            --color-warm-bg: #faf8f5;
+            --color-cream: #f5f1eb;
+            --color-sage: #e8ede8;
+
+            --text-dark: #2d2520;
+            --text-medium: #6b5d52;
+            --text-light: #9a8e82;
+
+            --border-color: #e5dfd6;
+            --shadow-sm: 0 2px 8px rgba(45, 37, 32, 0.08);
+            --shadow-md: 0 4px 16px rgba(45, 37, 32, 0.12);
+            --shadow-lg: 0 8px 32px rgba(45, 37, 32, 0.16);
+            --shadow-xl: 0 16px 48px rgba(45, 37, 32, 0.2);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--color-warm-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text h1 {
+            font-family: 'Spectral', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--color-cream);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .calendar-title {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .calendar-title h2 {
+            font-family: 'Spectral', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .month-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .month-nav button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .month-nav button:hover {
+            background: var(--color-cream);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--color-cream);
+            padding: 4px;
+            border-radius: var(--radius-md);
+        }
+
+        .view-toggle button {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-medium);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .view-toggle button.active {
+            background: white;
+            color: var(--color-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--color-sage);
+            padding: 20px;
+            gap: 16px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 20px;
+            gap: 16px;
+            min-height: 600px;
+        }
+
+        .calendar-day {
+            min-height: 120px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--color-warm-bg);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: var(--color-cream);
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.4;
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, rgba(193, 120, 84, 0.1) 0%, rgba(212, 165, 116, 0.1) 100%);
+            border-color: var(--color-primary);
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+        }
+
+        .today .day-number {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .event-chip {
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .event-chip:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .event-chip.event-type-social {
+            background: linear-gradient(135deg, #ffd6a5 0%, #fdffb6 100%);
+            color: #8b5e3c;
+        }
+
+        .event-chip.event-type-meeting {
+            background: linear-gradient(135deg, #caffbf 0%, #9bf6ff 100%);
+            color: #2d5a4e;
+        }
+
+        .event-chip.event-type-workshop {
+            background: linear-gradient(135deg, #ffc6ff 0%, #bdb2ff 100%);
+            color: #5a4570;
+        }
+
+        .event-chip.event-type-celebration {
+            background: linear-gradient(135deg, #ffadad 0%, #ffd6a5 100%);
+            color: #8b4537;
+        }
+
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .add-event-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .calendar-day:hover .add-event-hint {
+            opacity: 1;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(45, 37, 32, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 32px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-header-content {
+            flex: 1;
+        }
+
+        .event-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .modal h2 {
+            font-family: 'Spectral', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 24px;
+            color: var(--text-medium);
+            font-size: 0.9375rem;
+        }
+
+        .event-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--color-cream);
+            color: var(--color-primary);
+        }
+
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .event-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .event-image {
+            aspect-ratio: 4/3;
+            background: var(--color-cream);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .event-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-image.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--text-light);
+        }
+
+        .event-section {
+            margin-bottom: 32px;
+        }
+
+        .event-section h3 {
+            font-family: 'Spectral', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .event-description {
+            color: var(--text-medium);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .attendees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .attendee-card {
+            text-align: center;
+        }
+
+        .attendee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0 auto 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .attendee-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+
+        .attendee-status {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .event-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 24px;
+            background: var(--color-warm-bg);
+            border-radius: var(--radius-md);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Spectral', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-footer {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Add Event Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 0.9375rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(193, 120, 84, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calendar-day {
+            animation: slideInUp 0.4s ease-out backwards;
+        }
+
+        .calendar-day:nth-child(7n+1) { animation-delay: 0.05s; }
+        .calendar-day:nth-child(7n+2) { animation-delay: 0.1s; }
+        .calendar-day:nth-child(7n+3) { animation-delay: 0.15s; }
+        .calendar-day:nth-child(7n+4) { animation-delay: 0.2s; }
+        .calendar-day:nth-child(7n+5) { animation-delay: 0.25s; }
+        .calendar-day:nth-child(7n+6) { animation-delay: 0.3s; }
+        .calendar-day:nth-child(7n+7) { animation-delay: 0.35s; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .calendar-days {
+                gap: 8px;
+            }
+
+            .calendar-day {
+                min-height: 100px;
+            }
+
+            .event-images {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .calendar-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .calendar-title h2 {
+                font-size: 2rem;
+            }
+
+            .calendar-days {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .calendar-weekdays {
+                display: none;
+            }
+
+            .calendar-day {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: auto;
+                padding: 16px;
+            }
+
+            .day-events {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .attendees-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .event-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                max-width: 100%;
+                margin: 20px;
+            }
+
+            .modal-body {
+                padding: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📅</div>
+                <div class="logo-text">
+                    <h1>Community Calendar</h1>
+                    <p>120 Members</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">
+                    <span>⚙️</span> Settings
+                </button>
+                <button class="btn btn-primary" onclick="openAddEventModal()">
+                    <span>+</span> Add Event
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="calendar-header">
+            <div class="calendar-title">
+                <h2 id="currentMonth">January 2025</h2>
+                <div class="month-nav">
+                    <button onclick="changeMonth(-1)">‹</button>
+                    <button onclick="changeMonth(1)">›</button>
+                </div>
+            </div>
+            <div class="view-toggle">
+                <button class="active">Month</button>
+                <button>Week</button>
+                <button>List</button>
+            </div>
+        </div>
+
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                <div class="weekday">Sun</div>
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+                <!-- Calendar days will be generated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Event Detail Modal -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <span class="event-type-badge" id="modalEventType" style="background: linear-gradient(135deg, #ffd6a5 0%, #fdffb6 100%); color: #8b5e3c;">Social Gathering</span>
+                    <h2 id="modalEventTitle">Community BBQ & Potluck</h2>
+                    <div class="event-meta">
+                        <div class="event-meta-item">
+                            <span>📅</span>
+                            <span id="modalEventDate">Saturday, Jan 15, 2025</span>
+                        </div>
+                        <div class="event-meta-item">
+                            <span>🕐</span>
+                            <span id="modalEventTime">2:00 PM - 6:00 PM</span>
+                        </div>
+                        <div class="event-meta-item">
+                            <span>📍</span>
+                            <span id="modalEventLocation">Community Park</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="close-modal" onclick="closeEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-section">
+                    <div class="event-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="modalAttendeeCount">32</span>
+                            <span class="stat-label">Attending</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="modalMaybeCount">8</span>
+                            <span class="stat-label">Maybe</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="modalImagesCount">12</span>
+                            <span class="stat-label">Photos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-section">
+                    <h3>Event Photos</h3>
+                    <div class="event-images" id="modalEventImages">
+                        <div class="event-image placeholder">🖼️</div>
+                        <div class="event-image placeholder">🖼️</div>
+                        <div class="event-image placeholder">🖼️</div>
+                    </div>
+                </div>
+
+                <div class="event-section">
+                    <h3>About This Event</h3>
+                    <p class="event-description" id="modalEventDescription">
+                        Join us for our monthly community BBQ! Bring your favorite dish to share and enjoy good food, great company, and fun activities for all ages. We'll have lawn games, music, and plenty of space to relax and connect with neighbors.
+                    </p>
+                </div>
+
+                <div class="event-section">
+                    <h3>Who's Coming (<span id="modalAttendeeListCount">32</span>)</h3>
+                    <div class="attendees-grid" id="modalAttendeesList">
+                        <!-- Attendees will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEventModal()">Close</button>
+                <button class="btn btn-primary">I'm Attending</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal-overlay" id="addEventModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <h2>Create New Event</h2>
+                </div>
+                <button class="close-modal" onclick="closeAddEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="addEventForm">
+                    <div class="form-group">
+                        <label>Event Title</label>
+                        <input type="text" placeholder="Community BBQ & Potluck" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Event Type</label>
+                        <select required>
+                            <option value="social">Social Gathering</option>
+                            <option value="meeting">Community Meeting</option>
+                            <option value="workshop">Workshop / Class</option>
+                            <option value="celebration">Celebration</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" placeholder="Community Park">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea placeholder="Tell everyone about your event..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddEventModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createEvent()">Create Event</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample event data
+        const events = [
+            {
+                id: 1,
+                title: "Community BBQ",
+                type: "social",
+                date: new Date(2025, 0, 15),
+                time: "2:00 PM - 6:00 PM",
+                location: "Community Park",
+                description: "Join us for our monthly community BBQ! Bring your favorite dish to share and enjoy good food, great company, and fun activities for all ages.",
+                attendees: 32,
+                maybe: 8,
+                images: 12
+            },
+            {
+                id: 2,
+                title: "Monthly Meeting",
+                type: "meeting",
+                date: new Date(2025, 0, 18),
+                time: "7:00 PM - 8:30 PM",
+                location: "Community Center",
+                description: "Our regular monthly meeting to discuss community matters and upcoming projects.",
+                attendees: 45,
+                maybe: 12,
+                images: 3
+            },
+            {
+                id: 3,
+                title: "Yoga Workshop",
+                type: "workshop",
+                date: new Date(2025, 0, 20),
+                time: "9:00 AM - 11:00 AM",
+                location: "Park Pavilion",
+                description: "Free yoga workshop for all skill levels. Bring your own mat!",
+                attendees: 18,
+                maybe: 5,
+                images: 8
+            },
+            {
+                id: 4,
+                title: "Birthday Party",
+                type: "celebration",
+                date: new Date(2025, 0, 22),
+                time: "4:00 PM - 7:00 PM",
+                location: "Smith Residence",
+                description: "Celebrating Sarah's birthday! All neighbors welcome.",
+                attendees: 25,
+                maybe: 3,
+                images: 15
+            },
+            {
+                id: 5,
+                title: "Book Club",
+                type: "social",
+                date: new Date(2025, 0, 25),
+                time: "6:30 PM - 8:00 PM",
+                location: "Community Library",
+                description: "This month we're reading 'The Overstory' by Richard Powers.",
+                attendees: 12,
+                maybe: 4,
+                images: 2
+            }
+        ];
+
+        let currentDate = new Date();
+        let selectedEvent = null;
+
+        // Generate sample attendees
+        function generateAttendees(count) {
+            const names = ['Alice', 'Bob', 'Carol', 'David', 'Emma', 'Frank', 'Grace', 'Henry', 'Iris', 'Jack', 'Kate', 'Leo', 'Maya', 'Noah', 'Olivia', 'Paul', 'Quinn', 'Ruby', 'Sam', 'Tara', 'Uma', 'Victor', 'Wendy', 'Xander', 'Yara', 'Zoe'];
+            const attendees = [];
+            for (let i = 0; i < count; i++) {
+                const name = names[i % names.length] + ' ' + String.fromCharCode(65 + Math.floor(i / names.length));
+                attendees.push({
+                    name: name,
+                    initials: name.split(' ').map(n => n[0]).join(''),
+                    status: Math.random() > 0.2 ? 'Going' : 'Maybe'
+                });
+            }
+            return attendees;
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Update month title
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+
+            // Add previous month's trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const dayEl = createDayElement(day, true, month - 1);
+                calendarDays.appendChild(dayEl);
+            }
+
+            // Add current month's days
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+                const dayEl = createDayElement(day, false, month, isToday);
+                calendarDays.appendChild(dayEl);
+            }
+
+            // Add next month's leading days
+            const totalCells = calendarDays.children.length;
+            const remainingCells = 35 - totalCells; // Show 5 weeks
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayEl = createDayElement(day, true, month + 1);
+                calendarDays.appendChild(dayEl);
+            }
+        }
+
+        function createDayElement(day, isOtherMonth, month, isToday = false) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            if (isOtherMonth) dayEl.classList.add('other-month');
+            if (isToday) dayEl.classList.add('today');
+
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = day;
+            dayEl.appendChild(dayNumber);
+
+            const dayEvents = document.createElement('div');
+            dayEvents.className = 'day-events';
+
+            // Check for events on this day
+            const dayDate = new Date(currentDate.getFullYear(), month, day);
+            const dayEventsData = events.filter(event =>
+                event.date.getDate() === day &&
+                event.date.getMonth() === month &&
+                event.date.getFullYear() === currentDate.getFullYear()
+            );
+
+            dayEventsData.forEach(event => {
+                const eventChip = document.createElement('div');
+                eventChip.className = `event-chip event-type-${event.type}`;
+                eventChip.innerHTML = `
+                    <span class="event-dot"></span>
+                    <span>${event.title}</span>
+                `;
+                eventChip.onclick = (e) => {
+                    e.stopPropagation();
+                    openEventModal(event);
+                };
+                dayEvents.appendChild(eventChip);
+            });
+
+            dayEl.appendChild(dayEvents);
+
+            // Add event button
+            const addHint = document.createElement('div');
+            addHint.className = 'add-event-hint';
+            addHint.textContent = '+';
+            addHint.onclick = (e) => {
+                e.stopPropagation();
+                openAddEventModal();
+            };
+            dayEl.appendChild(addHint);
+
+            return dayEl;
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function openEventModal(event) {
+            selectedEvent = event;
+
+            // Populate modal
+            const typeBadge = document.getElementById('modalEventType');
+            typeBadge.textContent = event.type.charAt(0).toUpperCase() + event.type.slice(1);
+
+            // Set badge style based on type
+            const typeStyles = {
+                social: 'background: linear-gradient(135deg, #ffd6a5 0%, #fdffb6 100%); color: #8b5e3c;',
+                meeting: 'background: linear-gradient(135deg, #caffbf 0%, #9bf6ff 100%); color: #2d5a4e;',
+                workshop: 'background: linear-gradient(135deg, #ffc6ff 0%, #bdb2ff 100%); color: #5a4570;',
+                celebration: 'background: linear-gradient(135deg, #ffadad 0%, #ffd6a5 100%); color: #8b4537;'
+            };
+            typeBadge.style.cssText = typeStyles[event.type];
+
+            document.getElementById('modalEventTitle').textContent = event.title;
+            document.getElementById('modalEventDate').textContent = event.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('modalEventTime').textContent = event.time;
+            document.getElementById('modalEventLocation').textContent = event.location;
+            document.getElementById('modalEventDescription').textContent = event.description;
+            document.getElementById('modalAttendeeCount').textContent = event.attendees;
+            document.getElementById('modalMaybeCount').textContent = event.maybe;
+            document.getElementById('modalImagesCount').textContent = event.images;
+            document.getElementById('modalAttendeeListCount').textContent = event.attendees;
+
+            // Generate attendees
+            const attendees = generateAttendees(Math.min(event.attendees, 20)); // Show max 20
+            const attendeesList = document.getElementById('modalAttendeesList');
+            attendeesList.innerHTML = attendees.map(att => `
+                <div class="attendee-card">
+                    <div class="attendee-avatar">${att.initials}</div>
+                    <div class="attendee-name">${att.name}</div>
+                    <div class="attendee-status">${att.status}</div>
+                </div>
+            `).join('');
+
+            // Show modal
+            const modal = document.getElementById('eventModal');
+            modal.classList.add('active');
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        function openAddEventModal() {
+            document.getElementById('addEventModal').classList.add('active');
+        }
+
+        function closeAddEventModal() {
+            document.getElementById('addEventModal').classList.remove('active');
+        }
+
+        function createEvent() {
+            // Here you would handle form submission
+            alert('Event creation functionality would be implemented here!');
+            closeAddEventModal();
+        }
+
+        // Close modals when clicking overlay
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Initialize calendar
+        renderCalendar();
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "calendar": {
+      "command": "node",
+      "args": ["/Users/dane/Development/funcalv4/calendar-mcp-server/dist/index.js"],
+      "env": {
+        "CALENDAR_API_URL": "http://localhost:3000/api/v1"
+      }
+    }
+  }
+}

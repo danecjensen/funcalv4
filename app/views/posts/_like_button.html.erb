@@ -1,0 +1,15 @@
+<%= turbo_frame_tag "like_button_#{post.id}" do %>
+  <% if user_signed_in? && post.liked_by?(current_user) %>
+    <%= button_to post_like_path(post), method: :delete, class: "btn btn-link text-danger p-0 border-0" do %>
+      <i class="bi bi-heart-fill"></i> <%= post.likes_count %>
+    <% end %>
+  <% elsif user_signed_in? %>
+    <%= button_to post_like_path(post), method: :post, class: "btn btn-link text-muted p-0 border-0" do %>
+      <i class="bi bi-heart"></i> <%= post.likes_count %>
+    <% end %>
+  <% else %>
+    <span class="text-muted">
+      <i class="bi bi-heart"></i> <%= post.likes_count %>
+    </span>
+  <% end %>
+<% end %>

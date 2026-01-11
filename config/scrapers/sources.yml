@@ -1,0 +1,53 @@
+# Scraper source configuration
+# Run `ScraperSource.load_from_yaml` to load these into the database
+# Or add `config.after_initialize { ScraperSource.load_from_yaml }` to application.rb
+
+do512:
+  name: "Do512"
+  base_url: "https://do512.com"
+  list_path: "/events/week"
+  scraper_class: "Do512Scraper"  # Uses existing custom scraper
+  color: "#ff6b35"
+  schedule:
+    cron: "0 6,12,18 * * *"  # 6am, noon, 6pm daily
+    interval_hours: 6
+
+austin_chronicle:
+  name: "Austin Chronicle"
+  base_url: "https://www.austinchronicle.com"
+  list_path: "/events"
+  scraper_class: "AustinChronicleScraper"  # Uses existing custom scraper
+  color: "#e84c3d"
+  schedule:
+    cron: "0 7,13,19 * * *"  # 7am, 1pm, 7pm daily
+    interval_hours: 6
+
+culturemap:
+  name: "CultureMap Austin"
+  base_url: "https://austin.culturemap.com"
+  list_path: "/events"
+  scraper_class: "CulturemapScraper"  # Uses existing custom scraper
+  color: "#2ecc71"
+  schedule:
+    cron: "0 8,14,20 * * *"  # 8am, 2pm, 8pm daily
+    interval_hours: 6
+
+# Example of a fully dynamic scraper (no custom class):
+# eventbrite_austin:
+#   name: "Eventbrite Austin"
+#   base_url: "https://www.eventbrite.com"
+#   list_path: "/d/tx--austin/events/"
+#   scraper_class: null  # Uses DynamicScraper
+#   color: "#f05537"
+#   selectors:
+#     event_links: 'a[href*="/e/"]'
+#     event_link_pattern: '/e/[^/]+-\d+$'
+#     title: 'h1'
+#     datetime: '[datetime], time[datetime]'
+#     venue: '.venue-name'
+#     location: '.location-info'
+#     description: '.event-description'
+#     image: 'meta[property="og:image"]'
+#   schedule:
+#     cron: "0 9,15,21 * * *"
+#     interval_hours: 6

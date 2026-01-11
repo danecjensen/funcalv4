@@ -1,14 +1,37 @@
 class Event < ApplicationRecord
+  EVENT_TYPES = %w[social meeting workshop community celebration].freeze
+
   belongs_to :post, optional: true
   belongs_to :calendar, optional: true
   has_one :creator, through: :post
+  has_many :rsvps, class_name: "EventRsvp", dependent: :destroy
+  has_many :attendees, through: :rsvps, source: :user
 
   validates :title, :starts_at, presence: true
+  validates :event_type, inclusion: { in: EVENT_TYPES }
   validate :must_belong_to_calendar_or_post
 
   # Get the owner of the event (via calendar or post)
   def owner
     calendar&.user || creator
+  end
+
+  # RSVP helpers
+  def rsvp_for(user)
+    return nil unless user
+    rsvps.find_by(user: user)
+  end
+
+  def rsvped_by?(user)
+    rsvp_for(user).present?
+  end
+
+  def attending_count
+    rsvps.attending.count
+  end
+
+  def maybe_count
+    rsvps.maybe.count
   end
 
   # PostgreSQL range-based scopes (uses GiST index)

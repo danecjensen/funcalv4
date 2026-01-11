@@ -6,16 +6,42 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
   <body>
-    <%= render "shared/navbar" %>
+    <header class="site-header">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">📅</div>
+          <div class="logo-text">
+            <h1>Community Calendar</h1>
+            <p>120 Members</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-custom btn-custom-secondary">
+            <span>⚙️</span> Settings
+          </button>
+          <button class="btn-custom btn-custom-primary" data-action="click->calendar#openAddEventModal">
+            <span>+</span> Add Event
+          </button>
+        </div>
+      </div>
+    </header>
 
-    <main class="container py-4">
+    <main>
       <%= render "shared/flash" %>
       <%= yield %>
     </main>
+
+    <% if user_signed_in? %>
+      <%= render "chat/panel" %>
+    <% end %>
   </body>
 </html>

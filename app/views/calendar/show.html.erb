@@ -1,67 +1,174 @@
-<%= turbo_frame_tag "event-details" do %>
-  <div class="event-detail">
-    <h3 class="mb-3"><%= @event.title %></h3>
-
-    <div class="event-meta mb-4">
-      <p class="mb-2">
-        <i class="bi bi-calendar-event text-primary"></i>
-        <strong>When:</strong>
-        <%= @event.starts_at.strftime("%A, %B %d, %Y at %l:%M %p") %>
-        <% if @event.ends_at.present? %>
-          - <%= @event.ends_at.strftime("%l:%M %p") %>
-        <% end %>
-        <% if @event.all_day? %>
-          <span class="badge bg-secondary">All Day</span>
-        <% end %>
-      </p>
-      <% if @event.location.present? %>
-        <p class="mb-2">
-          <i class="bi bi-geo-alt text-primary"></i>
-          <strong>Where:</strong> <%= @event.location %>
-        </p>
-      <% end %>
-      <p class="mb-0">
-        <i class="bi bi-person text-primary"></i>
-        <strong>Posted by:</strong>
-        <%= link_to @event.post.creator.display_name, user_path(@event.post.creator) %>
-      </p>
-    </div>
-
-    <hr>
-
-    <h5 class="mb-3">About this Event</h5>
-    <div class="card mb-4">
-      <div class="card-body">
-        <%= @event.post.body %>
+<div class="calendar-container-custom" data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json, calendar_id: @calendar.id) %>" data-calendar-create-url-value="<%= calendar_index_path %>" data-calendar-calendar-id-value="<%= @calendar.id %>">
+  <div class="calendar-header">
+    <div class="calendar-title">
+      <h2 data-calendar-target="currentMonth">January 2026</h2>
+      <div class="month-nav">
+        <button data-action="click->calendar#prevMonth">‹</button>
+        <button data-action="click->calendar#nextMonth">›</button>
       </div>
     </div>
-
-    <h5 class="mb-3">Discussion (<%= @event.post.comments_count %>)</h5>
-    <% if @event.post.comments.any? %>
-      <div class="comments-preview mb-3">
-        <% @event.post.comments.includes(:creator).recent.limit(5).each do |comment| %>
-          <div class="d-flex mb-2">
-            <%= render "shared/avatar", user: comment.creator, size: 28 %>
-            <div class="ms-2 bg-light rounded p-2 flex-grow-1">
-              <strong><%= comment.creator.display_name %></strong>
-              <small class="text-muted"><%= time_ago_in_words(comment.created_at) %> ago</small>
-              <div><%= comment.body %></div>
-            </div>
-          </div>
-        <% end %>
-
-        <% if @event.post.comments.count > 5 %>
-          <p class="text-muted">
-            And <%= @event.post.comments.count - 5 %> more comments...
-          </p>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-muted">No comments yet.</p>
-    <% end %>
-
-    <div class="mt-4">
-      <%= link_to "View Full Post on Timeline", post_path(@event.post), class: "btn btn-primary" %>
+    <div class="view-toggle">
+      <button class="active">Month</button>
+      <button>Week</button>
+      <button>List</button>
     </div>
   </div>
-<% end %>
+
+  <div class="calendar-grid">
+    <div class="calendar-weekdays">
+      <div class="weekday">Sun</div>
+      <div class="weekday">Mon</div>
+      <div class="weekday">Tue</div>
+      <div class="weekday">Wed</div>
+      <div class="weekday">Thu</div>
+      <div class="weekday">Fri</div>
+      <div class="weekday">Sat</div>
+    </div>
+    <div class="calendar-days" data-calendar-target="calendarDays"></div>
+  </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" data-calendar-target="eventModal" aria-hidden="true">
+  <div class="modal-custom" role="dialog" aria-modal="true">
+    <div class="modal-header-custom">
+      <div class="modal-header-content">
+        <span class="event-type-badge" data-calendar-target="modalEventType">Social</span>
+        <h2 data-calendar-target="modalEventTitle">Event Title</h2>
+        <div class="event-meta">
+          <div class="event-meta-item">
+            <span>📅</span>
+            <span data-calendar-target="modalEventDate">Date</span>
+          </div>
+          <div class="event-meta-item">
+            <span>🕐</span>
+            <span data-calendar-target="modalEventTime">Time</span>
+          </div>
+          <div class="event-meta-item">
+            <span>📍</span>
+            <span data-calendar-target="modalEventLocation">Location</span>
+          </div>
+        </div>
+      </div>
+      <button class="close-modal" data-action="click->calendar#closeEventModal" aria-label="Close">×</button>
+    </div>
+
+    <div class="modal-body-custom">
+      <div class="event-section">
+        <div class="event-stats">
+          <div class="stat">
+            <span class="stat-value" data-calendar-target="modalAttendeeCount">0</span>
+            <span class="stat-label">Attending</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Maybe</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Photos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-section">
+        <h3>Event Photos</h3>
+        <div class="event-images">
+          <div class="event-image placeholder">🖼️</div>
+          <div class="event-image placeholder">🖼️</div>
+          <div class="event-image placeholder">🖼️</div>
+        </div>
+      </div>
+
+      <div class="event-section">
+        <h3>About This Event</h3>
+        <p class="event-description" data-calendar-target="modalEventDescription"></p>
+      </div>
+
+      <div class="event-section" data-calendar-target="modalTagsSection">
+        <h3>Tags</h3>
+        <div class="tags-container" data-calendar-target="modalTags"></div>
+      </div>
+
+      <div class="event-section">
+        <h3>Who's Coming (<span data-calendar-target="modalAttendeeListCount">0</span>)</h3>
+        <div class="attendees-grid" data-calendar-target="modalAttendeesList"></div>
+      </div>
+
+      <div class="event-section">
+        <h3>Original Post</h3>
+        <div class="timeline-post">
+          <div data-calendar-target="modalTimelineText"></div>
+          <div class="timeline-author">
+            <div class="author-avatar"></div>
+            <div class="author-info">
+              <div class="author-name" data-calendar-target="modalAuthor"></div>
+              <div class="post-time" data-calendar-target="modalPostTime"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer-custom">
+      <button class="btn-custom btn-custom-secondary" data-action="click->calendar#closeEventModal">Close</button>
+      <button class="btn-custom btn-custom-primary">I'm Attending</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event Modal -->
+<div class="modal-overlay" data-calendar-target="addEventModal" aria-hidden="true">
+  <div class="modal-custom" role="dialog" aria-modal="true">
+    <div class="modal-header-custom">
+      <div class="modal-header-content">
+        <h2>Create New Event</h2>
+      </div>
+      <button class="close-modal" data-action="click->calendar#closeAddEventModal" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body-custom">
+      <form data-calendar-target="addEventForm">
+        <div class="form-group">
+          <label>Event Title</label>
+          <input type="text" name="title" placeholder="Holiday Potluck Dinner" required data-calendar-target="newEventTitle">
+        </div>
+
+        <div class="form-group">
+          <label>Event Type</label>
+          <select name="event_type" required data-calendar-target="newEventType">
+            <option value="social">Social</option>
+            <option value="meeting">Meeting</option>
+            <option value="workshop">Workshop</option>
+            <option value="community">Community</option>
+            <option value="celebration">Celebration</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" name="date" required data-calendar-target="newEventDate">
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" name="time" required data-calendar-target="newEventTime">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" placeholder="Community Hall" data-calendar-target="newEventLocation">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="Tell everyone about your event..." data-calendar-target="newEventDescription"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer-custom">
+      <button class="btn-custom btn-custom-secondary" data-action="click->calendar#closeAddEventModal">Cancel</button>
+      <button class="btn-custom btn-custom-primary" data-action="click->calendar#createEvent">Create Event</button>
+    </div>
+  </div>
+</div>

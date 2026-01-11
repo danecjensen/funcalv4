@@ -78,6 +78,7 @@ gem "omniauth-twitter", "~> 1.4"
 gem "pretender", "~> 0.3.4"
 gem "pundit", "~> 2.1"
 gem "sidekiq", "~> 6.2"
+gem "sidekiq-scheduler", "~> 5.0"
 gem "sitemap_generator", "~> 6.1"
 gem "whenever", require: false
 gem "responders", github: "heartcombo/responders", branch: "main"
@@ -88,3 +89,6 @@ gem "nokogiri"
 gem "httparty"
 gem "selenium-webdriver"
 gem "webdrivers"
+
+# iCal support
+gem "icalendar"

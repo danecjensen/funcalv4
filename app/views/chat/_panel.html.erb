@@ -1,0 +1,90 @@
+<%# Chat panel component - include in layout or any page %>
+<%# Usage: <%= render "chat/panel" %> %>
+
+<div data-controller="chat"
+     data-chat-api-url-value="<%= api_v1_chat_path %>"
+     data-chat-open-value="false"
+     class="chat-wrapper">
+
+  <%# Toggle button - fixed position %>
+  <button type="button"
+          class="chat-toggle-btn"
+          data-action="click->chat#toggle"
+          aria-label="Toggle chat assistant">
+    <span class="chat-toggle-icon">💬</span>
+    <span class="chat-toggle-label">Ask AI</span>
+  </button>
+
+  <%# Chat panel - slides in from right %>
+  <div class="chat-panel hidden" data-chat-target="panel">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <span class="chat-header-icon">🤖</span>
+        <div>
+          <h3>Calendar Assistant</h3>
+          <p>Ask me anything about your schedule</p>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button type="button"
+                class="chat-header-btn"
+                data-action="click->chat#clearHistory"
+                title="Clear conversation">
+          🗑️
+        </button>
+        <button type="button"
+                class="chat-header-btn"
+                data-action="click->chat#close"
+                title="Close">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-messages" data-chat-target="messages">
+      <%# Messages will be added here dynamically %>
+      <div class="chat-message chat-message-assistant">
+        <div class="chat-message-avatar">AI</div>
+        <div class="chat-message-content">
+          Hi! I'm your calendar assistant. I can help you:
+          <br><br>
+          • Create events: "Add lunch with Sarah tomorrow at noon"
+          <br>
+          • Find events: "What's happening this weekend?"
+          <br>
+          • Get recommendations: "Find me something fun to do"
+          <br><br>
+          How can I help?
+        </div>
+      </div>
+    </div>
+
+    <%# Typing indicator %>
+    <div class="chat-typing hidden" data-chat-target="typingIndicator">
+      <div class="chat-message chat-message-assistant">
+        <div class="chat-message-avatar">AI</div>
+        <div class="chat-message-content">
+          <span class="typing-dots">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <form class="chat-form" data-chat-target="form" data-action="submit->chat#submit">
+      <textarea
+        data-chat-target="input"
+        data-action="keydown->chat#handleKeydown"
+        placeholder="Type a message... (Enter to send, Shift+Enter for new line)"
+        rows="1"
+        class="chat-input"
+        autocomplete="off"></textarea>
+      <button type="submit"
+              class="chat-send-btn"
+              data-chat-target="sendButton"
+              aria-label="Send message">
+        ➤
+      </button>
+    </form>
+  </div>
+</div>

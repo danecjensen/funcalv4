@@ -24,12 +24,23 @@ end
     resource :like, only: [:create, :destroy]
   end
 
+  # Event RSVPs
+  resources :events, only: [:show] do
+    resource :rsvp, controller: "event_rsvps", only: [:create, :destroy]
+  end
+
   # Calendar
-  resources :calendar, only: [:index, :show] do
+  resources :calendar, only: [:index, :show, :create] do
     collection do
       get :events
     end
+    member do
+      post :generate_ical_token
+    end
   end
+
+  # iCal feed (public, token-based access)
+  get "calendars/:ical_token.ics", to: "calendars/ical#show", as: :calendar_ical_feed, format: :ics
 
   # User profiles
   resources :users, only: [:show, :edit, :update]
@@ -41,10 +52,16 @@ end
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # API routes for Chrome extension
+  # API routes for Chrome extension and MCP server
   namespace :api do
     namespace :v1 do
-      resources :events, only: [:create, :index]
+      resources :events, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get :search
+        end
+      end
+      resources :calendars, only: [:index, :show]
+      post :chat, to: "chat#create"
     end
   end
 end

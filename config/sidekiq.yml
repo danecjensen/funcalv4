@@ -1,0 +1,18 @@
+---
+:concurrency: 5
+:queues:
+  - default
+  - mailers
+  - scrapers
+
+# Sidekiq Scheduler configuration
+# These jobs run on a schedule
+:schedule:
+  scrape_all_sources:
+    cron: '0 */4 * * *'  # Every 4 hours
+    class: ScrapeAllSourcesJob
+    queue: scrapers
+    description: "Scrape all enabled event sources"
+
+  # Individual source schedules can be added here if needed
+  # or managed dynamically via ScraperSource records

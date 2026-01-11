@@ -12,3 +12,6 @@ application.register("calendar", CalendarController)
 
 import PostFormController from "./post_form_controller"
 application.register("post-form", PostFormController)
+
+import ChatController from "./chat_controller"
+application.register("chat", ChatController)

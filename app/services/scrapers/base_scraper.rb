@@ -29,37 +29,30 @@ module Scrapers
       end
 
       def save_event(event_data)
-        calendar = create_calendar
-        return nil unless calendar
-
-        source_id = generate_source_id(event_data)
-
-        existing = Event.find_by(source_name: source_name, source_id: source_id)
-        if existing
-          Rails.logger.info "[#{source_name}] Event already exists: #{event_data[:title]}"
-          return existing
+        admin = User.find_by(admin: true) || User.first
+        unless admin
+          Rails.logger.error "[#{source_name}] No admin user available for scraper"
+          return nil
         end
 
-        event = Event.new(
-          calendar: calendar,
-          title: event_data[:title],
-          starts_at: event_data[:starts_at],
-          ends_at: event_data[:ends_at],
-          location: event_data[:location],
-          venue: event_data[:venue],
-          description: event_data[:description],
-          source_url: event_data[:source_url],
-          image_url: event_data[:image_url],
-          source_name: source_name,
-          source_id: source_id,
-          all_day: event_data[:all_day] || false
+        result = EventCreationService.call(
+          user: admin,
+          params: event_data.merge(
+            source_name: source_name,
+            calendar_color: calendar_color
+          ),
+          source: :scraper
         )
 
-        if event.save
-          Rails.logger.info "[#{source_name}] Saved event: #{event.title}"
-          event
+        if result.success?
+          if result.duplicate?
+            Rails.logger.info "[#{source_name}] Event already exists: #{event_data[:title]}"
+          else
+            Rails.logger.info "[#{source_name}] Saved event: #{result.event.title}"
+          end
+          result.event
         else
-          Rails.logger.error "[#{source_name}] Failed to save event: #{event.errors.full_messages.join(', ')}"
+          Rails.logger.error "[#{source_name}] Failed to save event: #{result.errors.join(', ')}"
           nil
         end
       end

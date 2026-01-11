@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_09_001258) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -120,6 +120,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_09_001258) do
     t.text "description"
     t.string "source_name"
     t.string "source_id"
+    t.string "event_type", default: "social", null: false
     t.index ["calendar_id"], name: "index_events_on_calendar_id"
     t.index ["occurs_at"], name: "index_events_on_occurs_at_gist", using: :gist
     t.index ["post_id"], name: "index_events_on_post_id"

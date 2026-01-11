@@ -16,6 +16,10 @@ class User < ApplicationRecord
   has_many :calendar_subscriptions, dependent: :destroy
   has_many :subscribed_calendars, through: :calendar_subscriptions, source: :calendar
 
+  # RSVP associations
+  has_many :event_rsvps, dependent: :destroy
+  has_many :rsvped_events, through: :event_rsvps, source: :event
+
   def display_name
     [first_name, last_name].compact.join(" ").presence || email.split("@").first
   end

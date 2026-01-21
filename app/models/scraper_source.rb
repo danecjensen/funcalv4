@@ -6,8 +6,10 @@
 #   source.run_scraper  # Runs the scraper and saves events
 #
 class ScraperSource < ApplicationRecord
+  belongs_to :calendar, optional: true
+
   validates :name, presence: true
-  validates :slug, presence: true, uniqueness: true
+  validates :slug, presence: true, uniqueness: { scope: :calendar_id }
   validates :base_url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
   validates :color, format: { with: /\A#[0-9A-Fa-f]{6}\z/, message: "must be a valid hex color" }, allow_blank: true
 

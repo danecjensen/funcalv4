@@ -1,0 +1,75 @@
+<%= form_with model: calendar, url: calendar_path(calendar), method: :patch, class: "settings-card" do |f| %>
+  <div class="settings-card-header">
+    <h2 class="settings-card-title">General Settings</h2>
+    <p class="settings-card-description">Customize your calendar's appearance and basic information.</p>
+  </div>
+
+  <div class="settings-card-body">
+    <% if calendar.errors.any? %>
+      <div style="background: #fdf4f4; border: 1px solid #e8c4c3; border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px;">
+        <% calendar.errors.full_messages.each do |msg| %>
+          <p style="color: #c75450; margin: 0;"><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="settings-form-group">
+      <%= f.label :name, class: "settings-label" do %>
+        Calendar Name
+        <span class="settings-label-hint">Choose something memorable</span>
+      <% end %>
+      <%= f.text_field :name, class: "settings-input", placeholder: "My Calendar", required: true %>
+    </div>
+
+    <div class="settings-form-group">
+      <label class="settings-label">
+        Calendar Color
+        <span class="settings-label-hint">Used for event highlights</span>
+      </label>
+      <div class="settings-color-group">
+        <%= f.color_field :color, class: "settings-color-picker", value: calendar.color.presence || "#c17854", data: { action: "input->settings-tabs#syncColor" } %>
+        <%= f.text_field :color, class: "settings-input settings-color-hex", value: calendar.color.presence || "#c17854", pattern: "#[0-9A-Fa-f]{6}", data: { settings_tabs_target: "colorHex" } %>
+      </div>
+    </div>
+
+    <div class="settings-form-group">
+      <%= f.label :description, class: "settings-label" do %>
+        Description
+        <span class="settings-label-hint">Optional</span>
+      <% end %>
+      <%= f.text_area :description, class: "settings-input settings-textarea", placeholder: "What is this calendar for?", rows: 3 %>
+    </div>
+  </div>
+
+  <div class="settings-actions">
+    <%= link_to "Cancel", calendar_path(calendar), class: "settings-btn settings-btn-secondary" %>
+    <%= f.submit "Save Changes", class: "settings-btn settings-btn-primary" %>
+  </div>
+<% end %>
+
+<% if calendar.ical_token.present? %>
+  <div class="settings-card" style="margin-top: 24px;">
+    <div class="settings-card-header">
+      <h2 class="settings-card-title">iCal Feed</h2>
+      <p class="settings-card-description">Subscribe to this calendar from other apps like Apple Calendar or Google Calendar.</p>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-form-group" style="margin-bottom: 0;">
+        <label class="settings-label">Feed URL</label>
+        <div style="display: flex; gap: 12px;">
+          <input type="text"
+                 value="<%= calendar.ical_feed_url %>"
+                 class="settings-input"
+                 readonly
+                 style="font-family: 'SF Mono', Monaco, monospace; font-size: 0.8125rem; flex: 1;"
+                 id="ical-feed-url">
+          <button type="button"
+                  class="settings-btn settings-btn-secondary"
+                  onclick="navigator.clipboard.writeText(document.getElementById('ical-feed-url').value); this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000);">
+            Copy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

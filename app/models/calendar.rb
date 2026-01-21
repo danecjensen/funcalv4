@@ -3,12 +3,24 @@ class Calendar < ApplicationRecord
 
   belongs_to :user
   has_many :events, dependent: :destroy
+  has_many :scraper_sources, dependent: :destroy
 
   validates :name, presence: true
   validates :color, format: { with: /\A#[0-9A-Fa-f]{6}\z/, message: "must be a valid hex color" }, allow_blank: true
   validates :ical_token, uniqueness: true, allow_nil: true
+  validates :import_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https webcal]), message: "must be a valid URL" }, allow_blank: true
 
   before_create :set_ical_token
+
+  # Import helpers
+  def import_enabled?
+    import_enabled && import_url.present?
+  end
+
+  def needs_import_sync?
+    return false unless import_enabled?
+    last_imported_at.nil? || last_imported_at < import_interval_hours.hours.ago
+  end
 
   def owned_by?(user)
     return false unless user

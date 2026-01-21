@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_11_153943) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -88,6 +88,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
     t.string "color", default: "#3788d8"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ical_token"
+    t.string "import_url"
+    t.string "import_source"
+    t.datetime "last_imported_at"
+    t.boolean "import_enabled", default: false
+    t.integer "import_interval_hours", default: 6
+    t.text "import_error"
+    t.index ["ical_token"], name: "index_calendars_on_ical_token", unique: true
     t.index ["user_id", "name"], name: "index_calendars_on_user_id_and_name"
     t.index ["user_id"], name: "index_calendars_on_user_id"
   end
@@ -99,6 +107,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_comments_on_creator_id"
     t.index ["post_id"], name: "index_comments_on_post_id"
+  end
+
+  create_table "event_rsvps", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "user_id", null: false
+    t.string "status", default: "attending", null: false
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "user_id"], name: "index_event_rsvps_on_event_id_and_user_id", unique: true
+    t.index ["event_id"], name: "index_event_rsvps_on_event_id"
+    t.index ["status"], name: "index_event_rsvps_on_status"
+    t.index ["user_id"], name: "index_event_rsvps_on_user_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -179,6 +200,30 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
     t.index ["creator_id"], name: "index_posts_on_creator_id"
   end
 
+  create_table "scraper_sources", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "base_url", null: false
+    t.string "list_path"
+    t.string "scraper_class"
+    t.jsonb "selectors", default: {}
+    t.jsonb "schedule", default: {}
+    t.string "color", default: "#3788d8"
+    t.boolean "enabled", default: true
+    t.datetime "last_run_at"
+    t.datetime "last_success_at"
+    t.integer "last_run_count", default: 0
+    t.integer "total_events_scraped", default: 0
+    t.text "last_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "calendar_id"
+    t.index ["calendar_id", "slug"], name: "index_scraper_sources_on_calendar_id_and_slug", unique: true, where: "(calendar_id IS NOT NULL)"
+    t.index ["calendar_id"], name: "index_scraper_sources_on_calendar_id"
+    t.index ["enabled"], name: "index_scraper_sources_on_enabled"
+    t.index ["slug"], name: "index_scraper_sources_on_slug", unique: true
+  end
+
   create_table "services", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider"
@@ -219,10 +264,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_09_140010) do
   add_foreign_key "calendars", "users"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users", column: "creator_id"
+  add_foreign_key "event_rsvps", "events"
+  add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "calendars"
   add_foreign_key "events", "posts"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "posts", "users", column: "creator_id"
+  add_foreign_key "scraper_sources", "calendars"
   add_foreign_key "services", "users"
 end

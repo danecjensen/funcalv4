@@ -90,9 +90,11 @@ export default class extends Controller {
     endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()))
 
     try {
-      const response = await fetch(
-        `${this.eventsUrlValue}?start=${startDate.toISOString()}&end=${endDate.toISOString()}`
-      )
+      const url = new URL(this.eventsUrlValue, window.location.origin)
+      url.searchParams.set('start', startDate.toISOString())
+      url.searchParams.set('end', endDate.toISOString())
+
+      const response = await fetch(url)
       this.events = await response.json()
     } catch (error) {
       console.error('Error fetching events:', error)

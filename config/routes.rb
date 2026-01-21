@@ -30,12 +30,24 @@ end
   end
 
   # Calendar
-  resources :calendar, only: [:index, :show, :create] do
+  resources :calendar, only: [:index, :show, :create, :edit, :update] do
     collection do
       get :events
     end
     member do
       post :generate_ical_token
+    end
+
+    # Nested scraper management
+    resources :scraper_sources, only: [:create, :update, :destroy] do
+      member do
+        post :run
+      end
+    end
+
+    # iCal import
+    resource :import, only: [:update], controller: "calendar/imports" do
+      post :sync
     end
   end
 

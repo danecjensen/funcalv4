@@ -1,4 +1,5 @@
-<div class="calendar-container-custom" data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json) %>" data-calendar-create-url-value="<%= calendar_index_path %>">
+<div data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json) %>" data-calendar-create-url-value="<%= calendar_index_path %>">
+<div class="calendar-container-custom">
   <div class="calendar-header">
     <div class="calendar-title">
       <h2 data-calendar-target="currentMonth">January 2026</h2>
@@ -28,7 +29,7 @@
   </div>
 </div>
 
-<!-- Event Detail Modal -->
+<%# Event Detail Modal %>
 <div class="modal-overlay" data-calendar-target="eventModal" aria-hidden="true">
   <div class="modal-custom" role="dialog" aria-modal="true">
     <div class="modal-header-custom">
@@ -171,4 +172,5 @@
       <button class="btn-custom btn-custom-primary" data-action="click->calendar#createEvent">Create Event</button>
     </div>
   </div>
+</div>
 </div>

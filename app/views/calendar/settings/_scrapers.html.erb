@@ -1,0 +1,437 @@
+<style>
+  .scrapers-empty {
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .scrapers-empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: var(--color-cream);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .scrapers-empty h3 {
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    margin: 0 0 8px;
+  }
+
+  .scrapers-empty p {
+    color: var(--text-light);
+    margin: 0 0 24px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .scraper-list {
+    padding: 24px;
+  }
+
+  .scraper-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: var(--color-warm-bg);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .scraper-item:hover {
+    background: var(--color-cream);
+    border-color: var(--border-color);
+  }
+
+  .scraper-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .scraper-color {
+    width: 8px;
+    height: 100%;
+    min-height: 60px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .scraper-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .scraper-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .scraper-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1rem;
+  }
+
+  .scraper-badge {
+    font-size: 0.6875rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .scraper-badge-enabled {
+    background: rgba(123, 168, 130, 0.15);
+    color: #5a8a62;
+  }
+
+  .scraper-badge-disabled {
+    background: var(--border-color);
+    color: var(--text-light);
+  }
+
+  .scraper-url {
+    font-size: 0.8125rem;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .scraper-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.8125rem;
+    color: var(--text-medium);
+  }
+
+  .scraper-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .scraper-stat svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+  }
+
+  .scraper-error {
+    color: #c75450;
+    font-size: 0.8125rem;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(199, 84, 80, 0.08);
+    border-radius: var(--radius-sm);
+  }
+
+  .scraper-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .scraper-action-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-medium);
+    transition: all 0.2s ease;
+  }
+
+  .scraper-action-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-warm-bg);
+  }
+
+  .scraper-action-btn.danger:hover {
+    border-color: #c75450;
+    color: #c75450;
+    background: #fdf4f4;
+  }
+
+  .scraper-action-btn.primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+
+  .scraper-action-btn.primary:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+  }
+
+  /* Add Scraper Form */
+  .add-scraper-form {
+    padding: 24px;
+    border-top: 1px solid var(--border-color);
+    display: none;
+  }
+
+  .add-scraper-form.visible {
+    display: block;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-section-title {
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 24px 0 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .form-section-title:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .scraper-item {
+      flex-direction: column;
+    }
+
+    .scraper-color {
+      width: 100%;
+      height: 4px;
+      min-height: auto;
+    }
+
+    .scraper-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+</style>
+
+<div class="settings-card" data-controller="scrapers">
+  <div class="settings-card-header">
+    <h2 class="settings-card-title">Website Scrapers</h2>
+    <p class="settings-card-description">Automatically import events from websites. Configure CSS selectors to extract event data.</p>
+  </div>
+
+  <% if scrapers.any? %>
+    <div class="scraper-list">
+      <% scrapers.each do |scraper| %>
+        <div class="scraper-item" id="<%= dom_id(scraper) %>">
+          <div class="scraper-color" style="background: <%= scraper.color || '#c17854' %>;"></div>
+          <div class="scraper-info">
+            <div class="scraper-header">
+              <span class="scraper-name"><%= scraper.name %></span>
+              <% if scraper.enabled? %>
+                <span class="scraper-badge scraper-badge-enabled">Active</span>
+              <% else %>
+                <span class="scraper-badge scraper-badge-disabled">Paused</span>
+              <% end %>
+            </div>
+            <div class="scraper-url"><%= scraper.base_url %><%= scraper.list_path %></div>
+            <div class="scraper-stats">
+              <% if scraper.last_run_at %>
+                <span class="scraper-stat">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <%= time_ago_in_words(scraper.last_run_at) %> ago
+                </span>
+                <span class="scraper-stat">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <%= scraper.last_run_count %> events
+                </span>
+              <% else %>
+                <span class="scraper-stat" style="color: var(--text-light);">Never run</span>
+              <% end %>
+              <span class="scraper-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20V10"/>
+                  <path d="M18 20V4"/>
+                  <path d="M6 20v-4"/>
+                </svg>
+                <%= scraper.total_events_scraped %> total
+              </span>
+            </div>
+            <% if scraper.last_error.present? %>
+              <div class="scraper-error">
+                <strong>Error:</strong> <%= scraper.last_error.truncate(100) %>
+              </div>
+            <% end %>
+          </div>
+          <div class="scraper-actions">
+            <%= button_to run_calendar_scraper_source_path(calendar, scraper),
+                method: :post,
+                class: "scraper-action-btn primary",
+                title: "Run now",
+                data: { turbo: false } do %>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            <% end %>
+            <%= button_to calendar_scraper_source_path(calendar, scraper),
+                method: :delete,
+                class: "scraper-action-btn danger",
+                title: "Delete",
+                data: { turbo_confirm: "Delete this scraper?" } do %>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="scrapers-empty">
+      <div class="scrapers-empty-icon">🌐</div>
+      <h3>No scrapers configured</h3>
+      <p>Add a scraper to automatically import events from websites into this calendar.</p>
+      <button type="button"
+              class="settings-btn settings-btn-primary"
+              data-action="click->scrapers#toggleForm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Scraper
+      </button>
+    </div>
+  <% end %>
+
+  <div class="add-scraper-form" data-scrapers-target="form">
+    <%= form_with model: [calendar, calendar.scraper_sources.build], url: calendar_scraper_sources_path(calendar) do |f| %>
+      <h4 class="form-section-title">Basic Information</h4>
+
+      <div class="form-row">
+        <div class="settings-form-group">
+          <%= f.label :name, "Scraper Name", class: "settings-label" %>
+          <%= f.text_field :name, class: "settings-input", placeholder: "Local Events", required: true %>
+        </div>
+        <div class="settings-form-group">
+          <%= f.label :color, "Color", class: "settings-label" %>
+          <div class="settings-color-group">
+            <%= f.color_field :color, class: "settings-color-picker", value: "#c17854" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="settings-form-group">
+          <%= f.label :base_url, "Website URL", class: "settings-label" %>
+          <%= f.url_field :base_url, class: "settings-input", placeholder: "https://example.com", required: true %>
+        </div>
+        <div class="settings-form-group">
+          <%= f.label :list_path, "Events List Path", class: "settings-label" %>
+          <%= f.text_field :list_path, class: "settings-input", placeholder: "/events" %>
+        </div>
+      </div>
+
+      <h4 class="form-section-title">CSS Selectors</h4>
+      <p style="color: var(--text-light); font-size: 0.875rem; margin: -8px 0 16px;">
+        Define CSS selectors to extract event data from the website.
+      </p>
+
+      <div class="form-row">
+        <div class="settings-form-group">
+          <label class="settings-label">Event Links</label>
+          <input type="text" name="scraper_source[selectors][event_links]" class="settings-input" placeholder='a[href*="/event"]'>
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Title</label>
+          <input type="text" name="scraper_source[selectors][title]" class="settings-input" placeholder="h1, .event-title">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="settings-form-group">
+          <label class="settings-label">Date/Time</label>
+          <input type="text" name="scraper_source[selectors][datetime]" class="settings-input" placeholder="[datetime], time, .date">
+        </div>
+        <div class="settings-form-group">
+          <label class="settings-label">Location</label>
+          <input type="text" name="scraper_source[selectors][location]" class="settings-input" placeholder=".venue, .address">
+        </div>
+      </div>
+
+      <div class="settings-toggle-row" style="margin-top: 24px;">
+        <div class="settings-toggle-info">
+          <h4>Enable Automatic Scraping</h4>
+          <p>Scrape events automatically every few hours</p>
+        </div>
+        <label class="settings-toggle">
+          <%= f.check_box :enabled, checked: true %>
+          <span class="settings-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+        <button type="button" class="settings-btn settings-btn-secondary" data-action="click->scrapers#toggleForm">
+          Cancel
+        </button>
+        <%= f.submit "Add Scraper", class: "settings-btn settings-btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if scrapers.any? %>
+    <div class="settings-actions">
+      <button type="button"
+              class="settings-btn settings-btn-primary"
+              data-action="click->scrapers#toggleForm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Scraper
+      </button>
+    </div>
+  <% end %>
+</div>

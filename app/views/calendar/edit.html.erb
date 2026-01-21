@@ -1,0 +1,1369 @@
+<%= content_for :head do %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     MIDNIGHT STUDIO - Calendar Settings
+     A dark, refined creative workspace
+     ======================================== */
+
+  :root {
+    --ms-void: #0d0f12;
+    --ms-deep: #14171d;
+    --ms-surface: #1a1e26;
+    --ms-elevated: #232830;
+    --ms-border: #2d333d;
+    --ms-border-subtle: #252a33;
+
+    --ms-text: #e8eaed;
+    --ms-text-secondary: #9ba3af;
+    --ms-text-muted: #6b7280;
+
+    --ms-accent: #6ee7b7;
+    --ms-accent-dim: rgba(110, 231, 183, 0.15);
+    --ms-accent-glow: rgba(110, 231, 183, 0.25);
+
+    --ms-coral: #fb7185;
+    --ms-amber: #fbbf24;
+    --ms-violet: #a78bfa;
+
+    --ms-radius: 16px;
+    --ms-radius-sm: 10px;
+    --ms-radius-xs: 6px;
+
+    --ms-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --ms-shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    --ms-glow: 0 0 40px -10px var(--ms-accent);
+  }
+
+  .ms-settings-page {
+    min-height: 100vh;
+    background: var(--ms-void);
+    font-family: 'Outfit', -apple-system, sans-serif;
+    color: var(--ms-text);
+    overflow-x: hidden;
+  }
+
+  /* Ambient background effects */
+  .ms-ambient {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .ms-ambient::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--ms-accent-dim) 0%, transparent 60%);
+    filter: blur(80px);
+    animation: ambientDrift 20s ease-in-out infinite;
+  }
+
+  .ms-ambient::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -15%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(251, 113, 133, 0.08) 0%, transparent 60%);
+    filter: blur(100px);
+    animation: ambientDrift 25s ease-in-out infinite reverse;
+  }
+
+  @keyframes ambientDrift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+  }
+
+  /* Main layout - sidebar + content */
+  .ms-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .ms-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--ms-border-subtle);
+    background: linear-gradient(180deg, var(--ms-deep) 0%, var(--ms-void) 100%);
+  }
+
+  .ms-sidebar-header {
+    margin-bottom: 48px;
+  }
+
+  .ms-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ms-text-muted);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 8px 0;
+    transition: all 0.2s ease;
+    margin-bottom: 24px;
+  }
+
+  .ms-back-link:hover {
+    color: var(--ms-accent);
+  }
+
+  .ms-back-link svg {
+    transition: transform 0.2s ease;
+  }
+
+  .ms-back-link:hover svg {
+    transform: translateX(-3px);
+  }
+
+  .ms-calendar-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ms-calendar-color {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--ms-radius-sm);
+    background: linear-gradient(135deg, var(--ms-accent) 0%, #34d399 100%);
+    box-shadow: var(--ms-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  .ms-calendar-info h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .ms-calendar-info span {
+    font-size: 0.75rem;
+    color: var(--ms-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  /* Vertical Tab Navigation */
+  .ms-nav {
+    flex: 1;
+  }
+
+  .ms-nav-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ms-text-muted);
+    padding: 0 16px;
+    margin-bottom: 12px;
+  }
+
+  .ms-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ms-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: none;
+    background: transparent;
+    color: var(--ms-text-secondary);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--ms-radius-sm);
+    transition: all 0.25s ease;
+    text-align: left;
+    width: 100%;
+  }
+
+  .ms-nav-item:hover {
+    color: var(--ms-text);
+    background: var(--ms-elevated);
+  }
+
+  .ms-nav-item.active {
+    color: var(--ms-accent);
+    background: var(--ms-accent-dim);
+  }
+
+  .ms-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: var(--ms-accent);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .ms-nav-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .ms-nav-item.active .ms-nav-icon,
+  .ms-nav-item:hover .ms-nav-icon {
+    opacity: 1;
+  }
+
+  .ms-nav-badge {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    background: var(--ms-accent);
+    color: var(--ms-void);
+    border-radius: 10px;
+  }
+
+  .ms-sidebar-footer {
+    padding-top: 24px;
+    border-top: 1px solid var(--ms-border-subtle);
+    margin-top: auto;
+  }
+
+  .ms-help-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ms-text-muted);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    padding: 10px 16px;
+    border-radius: var(--ms-radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .ms-help-link:hover {
+    color: var(--ms-text-secondary);
+    background: var(--ms-elevated);
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .ms-content {
+    padding: 48px 56px;
+    overflow-y: auto;
+  }
+
+  .ms-panel {
+    display: none;
+    animation: panelIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ms-panel.active {
+    display: block;
+  }
+
+  @keyframes panelIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .ms-panel-header {
+    margin-bottom: 40px;
+  }
+
+  .ms-panel-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    letter-spacing: -0.03em;
+  }
+
+  .ms-panel-subtitle {
+    color: var(--ms-text-muted);
+    font-size: 0.9375rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Card container */
+  .ms-card {
+    background: var(--ms-surface);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .ms-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .ms-card-section {
+    padding: 28px;
+    border-bottom: 1px solid var(--ms-border-subtle);
+  }
+
+  .ms-card-section:last-child {
+    border-bottom: none;
+  }
+
+  .ms-card-section-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 20px;
+    color: var(--ms-text);
+  }
+
+  /* Form Elements */
+  .ms-field {
+    margin-bottom: 24px;
+  }
+
+  .ms-field:last-child {
+    margin-bottom: 0;
+  }
+
+  .ms-label {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .ms-label-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ms-text);
+  }
+
+  .ms-label-hint {
+    font-size: 0.75rem;
+    color: var(--ms-text-muted);
+    font-weight: 400;
+  }
+
+  .ms-input,
+  .ms-textarea,
+  .ms-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--ms-deep);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-sm);
+    color: var(--ms-text);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+  }
+
+  .ms-input::placeholder,
+  .ms-textarea::placeholder {
+    color: var(--ms-text-muted);
+  }
+
+  .ms-input:hover,
+  .ms-textarea:hover,
+  .ms-select:hover {
+    border-color: var(--ms-text-muted);
+  }
+
+  .ms-input:focus,
+  .ms-textarea:focus,
+  .ms-select:focus {
+    outline: none;
+    border-color: var(--ms-accent);
+    box-shadow: 0 0 0 3px var(--ms-accent-dim);
+  }
+
+  .ms-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .ms-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 44px;
+  }
+
+  /* Color Picker */
+  .ms-color-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ms-color-swatch {
+    width: 52px;
+    height: 52px;
+    border: 2px solid var(--ms-border);
+    border-radius: var(--ms-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    -webkit-appearance: none;
+  }
+
+  .ms-color-swatch::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .ms-color-swatch::-webkit-color-swatch {
+    border: none;
+    border-radius: calc(var(--ms-radius-sm) - 2px);
+  }
+
+  .ms-color-swatch:hover {
+    transform: scale(1.05);
+    box-shadow: var(--ms-shadow-sm);
+  }
+
+  .ms-color-hex {
+    width: 110px;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Toggle Row */
+  .ms-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    background: var(--ms-deep);
+    border-radius: var(--ms-radius-sm);
+    border: 1px solid var(--ms-border-subtle);
+    transition: border-color 0.2s ease;
+  }
+
+  .ms-toggle-row:hover {
+    border-color: var(--ms-border);
+  }
+
+  .ms-toggle-info h4 {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ms-text);
+    margin: 0 0 4px;
+  }
+
+  .ms-toggle-info p {
+    font-size: 0.8125rem;
+    color: var(--ms-text-muted);
+    margin: 0;
+  }
+
+  .ms-toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .ms-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .ms-toggle-track {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--ms-border);
+    border-radius: 13px;
+    transition: all 0.3s ease;
+  }
+
+  .ms-toggle-track::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--ms-text);
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .ms-toggle input:checked + .ms-toggle-track {
+    background: var(--ms-accent);
+  }
+
+  .ms-toggle input:checked + .ms-toggle-track::before {
+    transform: translateX(22px);
+    background: var(--ms-void);
+  }
+
+  .ms-toggle input:focus-visible + .ms-toggle-track {
+    box-shadow: 0 0 0 3px var(--ms-accent-dim);
+  }
+
+  /* Action Footer */
+  .ms-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 28px;
+    background: var(--ms-deep);
+    border-top: 1px solid var(--ms-border-subtle);
+  }
+
+  .ms-btn {
+    padding: 12px 24px;
+    border-radius: var(--ms-radius-xs);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ms-btn-primary {
+    background: var(--ms-accent);
+    color: var(--ms-void);
+  }
+
+  .ms-btn-primary:hover {
+    background: #5dd9a8;
+    transform: translateY(-1px);
+    box-shadow: var(--ms-glow);
+  }
+
+  .ms-btn-ghost {
+    background: transparent;
+    color: var(--ms-text-secondary);
+    border: 1px solid var(--ms-border);
+  }
+
+  .ms-btn-ghost:hover {
+    background: var(--ms-elevated);
+    color: var(--ms-text);
+    border-color: var(--ms-text-muted);
+  }
+
+  .ms-btn-danger {
+    background: transparent;
+    color: var(--ms-coral);
+    border: 1px solid rgba(251, 113, 133, 0.3);
+  }
+
+  .ms-btn-danger:hover {
+    background: rgba(251, 113, 133, 0.1);
+    border-color: var(--ms-coral);
+  }
+
+  /* iCal Feed Box */
+  .ms-feed-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .ms-feed-url {
+    flex: 1;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 0.75rem;
+    padding: 12px 14px;
+    background: var(--ms-void);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-xs);
+    color: var(--ms-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ms-feed-copy {
+    padding: 12px 16px;
+    background: var(--ms-elevated);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-xs);
+    color: var(--ms-text);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ms-feed-copy:hover {
+    background: var(--ms-border);
+  }
+
+  /* Import Sources */
+  .ms-sources {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .ms-source {
+    position: relative;
+    padding: 24px 16px;
+    background: var(--ms-deep);
+    border: 2px solid var(--ms-border);
+    border-radius: var(--ms-radius-sm);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+  }
+
+  .ms-source:hover {
+    border-color: var(--ms-text-muted);
+    transform: translateY(-2px);
+  }
+
+  .ms-source.selected {
+    border-color: var(--ms-accent);
+    background: var(--ms-accent-dim);
+  }
+
+  .ms-source input {
+    display: none;
+  }
+
+  .ms-source-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    background: var(--ms-elevated);
+    border-radius: var(--ms-radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .ms-source.selected .ms-source-icon {
+    background: var(--ms-accent);
+    box-shadow: var(--ms-glow);
+  }
+
+  .ms-source-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ms-text);
+  }
+
+  /* Status Indicator */
+  .ms-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--ms-deep);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-xs);
+    font-size: 0.8125rem;
+    color: var(--ms-text-secondary);
+    margin-top: 16px;
+  }
+
+  .ms-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ms-accent);
+    animation: statusPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .ms-status.error {
+    border-color: rgba(251, 113, 133, 0.3);
+  }
+
+  .ms-status.error .ms-status-dot {
+    background: var(--ms-coral);
+  }
+
+  /* Scrapers List */
+  .ms-scraper-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ms-scraper-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--ms-deep);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .ms-scraper-item:hover {
+    border-color: var(--ms-text-muted);
+  }
+
+  .ms-scraper-color {
+    width: 4px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .ms-scraper-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ms-scraper-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .ms-scraper-name {
+    font-weight: 600;
+    color: var(--ms-text);
+  }
+
+  .ms-scraper-badge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .ms-scraper-badge.active {
+    background: var(--ms-accent-dim);
+    color: var(--ms-accent);
+  }
+
+  .ms-scraper-badge.paused {
+    background: var(--ms-elevated);
+    color: var(--ms-text-muted);
+  }
+
+  .ms-scraper-url {
+    font-size: 0.8125rem;
+    color: var(--ms-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 10px;
+  }
+
+  .ms-scraper-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.75rem;
+    color: var(--ms-text-muted);
+  }
+
+  .ms-scraper-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ms-scraper-actions {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .ms-scraper-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ms-elevated);
+    border: 1px solid var(--ms-border);
+    border-radius: var(--ms-radius-xs);
+    color: var(--ms-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ms-scraper-btn:hover {
+    background: var(--ms-border);
+    color: var(--ms-text);
+  }
+
+  .ms-scraper-btn.run {
+    background: var(--ms-accent);
+    border-color: var(--ms-accent);
+    color: var(--ms-void);
+  }
+
+  .ms-scraper-btn.run:hover {
+    background: #5dd9a8;
+  }
+
+  .ms-scraper-btn.danger:hover {
+    background: rgba(251, 113, 133, 0.15);
+    border-color: var(--ms-coral);
+    color: var(--ms-coral);
+  }
+
+  /* Empty State */
+  .ms-empty {
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .ms-empty-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    background: var(--ms-elevated);
+    border-radius: var(--ms-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .ms-empty h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+
+  .ms-empty p {
+    color: var(--ms-text-muted);
+    font-size: 0.9375rem;
+    margin: 0 0 24px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Add Scraper Form */
+  .ms-add-form {
+    display: none;
+    padding: 28px;
+    border-top: 1px solid var(--ms-border);
+    animation: formSlide 0.3s ease;
+  }
+
+  .ms-add-form.visible {
+    display: block;
+  }
+
+  @keyframes formSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ms-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .ms-form-divider {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ms-text);
+    margin: 28px 0 20px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ms-border-subtle);
+  }
+
+  .ms-hint {
+    font-size: 0.8125rem;
+    color: var(--ms-text-muted);
+    margin: 8px 0 0;
+    line-height: 1.5;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .ms-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .ms-sidebar {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--ms-border-subtle);
+      padding: 24px;
+    }
+
+    .ms-nav-list {
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .ms-nav-item {
+      white-space: nowrap;
+    }
+
+    .ms-nav-item.active::before {
+      display: none;
+    }
+
+    .ms-content {
+      padding: 32px 24px;
+    }
+
+    .ms-sources {
+      grid-template-columns: 1fr;
+    }
+
+    .ms-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<% end %>
+
+<div class="ms-settings-page" data-controller="settings-tabs">
+  <div class="ms-ambient"></div>
+
+  <div class="ms-layout">
+    <!-- Sidebar -->
+    <aside class="ms-sidebar">
+      <div class="ms-sidebar-header">
+        <%= link_to calendar_path(@calendar), class: "ms-back-link" do %>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to calendar
+        <% end %>
+
+        <div class="ms-calendar-badge">
+          <div class="ms-calendar-color" style="background: <%= @calendar.color || 'linear-gradient(135deg, #6ee7b7 0%, #34d399 100%)' %>;">
+            <span style="filter: brightness(0);">📅</span>
+          </div>
+          <div class="ms-calendar-info">
+            <span>Settings</span>
+            <h1><%= @calendar.name %></h1>
+          </div>
+        </div>
+      </div>
+
+      <nav class="ms-nav" role="tablist">
+        <div class="ms-nav-label">Configuration</div>
+        <div class="ms-nav-list">
+          <button class="ms-nav-item active"
+                  role="tab"
+                  aria-selected="true"
+                  data-settings-tabs-target="tab"
+                  data-action="click->settings-tabs#switch"
+                  data-tab="general">
+            <svg class="ms-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v2m0 18v2m-9-11h2m18 0h-2m-2.6-6.4l-1.4 1.4m-9.2 9.2l-1.4 1.4m0-12l1.4 1.4m9.2 9.2l1.4 1.4"/>
+            </svg>
+            General
+          </button>
+          <button class="ms-nav-item"
+                  role="tab"
+                  aria-selected="false"
+                  data-settings-tabs-target="tab"
+                  data-action="click->settings-tabs#switch"
+                  data-tab="scrapers">
+            <svg class="ms-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            Scrapers
+            <% if @scrapers.any? %>
+              <span class="ms-nav-badge"><%= @scrapers.count %></span>
+            <% end %>
+          </button>
+          <button class="ms-nav-item"
+                  role="tab"
+                  aria-selected="false"
+                  data-settings-tabs-target="tab"
+                  data-action="click->settings-tabs#switch"
+                  data-tab="import">
+            <svg class="ms-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Import
+          </button>
+        </div>
+      </nav>
+
+      <div class="ms-sidebar-footer">
+        <a href="#" class="ms-help-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Help & Documentation
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ms-content">
+      <!-- General Panel -->
+      <div class="ms-panel active" data-settings-tabs-target="panel" data-panel="general">
+        <div class="ms-panel-header">
+          <h2 class="ms-panel-title">General Settings</h2>
+          <p class="ms-panel-subtitle">Configure your calendar's basic information and appearance.</p>
+        </div>
+
+        <%= form_with model: @calendar, url: calendar_path(@calendar), method: :patch do |f| %>
+          <div class="ms-card">
+            <div class="ms-card-section">
+              <h3 class="ms-card-section-title">Calendar Details</h3>
+
+              <div class="ms-field">
+                <label class="ms-label">
+                  <span class="ms-label-text">Name</span>
+                  <span class="ms-label-hint">What should we call this calendar?</span>
+                </label>
+                <%= f.text_field :name, class: "ms-input", placeholder: "My Calendar", required: true %>
+              </div>
+
+              <div class="ms-field">
+                <label class="ms-label">
+                  <span class="ms-label-text">Color</span>
+                  <span class="ms-label-hint">Used for visual identification</span>
+                </label>
+                <div class="ms-color-row">
+                  <%= f.color_field :color, class: "ms-color-swatch", value: @calendar.color.presence || "#6ee7b7", data: { action: "input->settings-tabs#syncColor" } %>
+                  <%= f.text_field :color, class: "ms-input ms-color-hex", value: @calendar.color.presence || "#6ee7b7", pattern: "#[0-9A-Fa-f]{6}", data: { settings_tabs_target: "colorHex" } %>
+                </div>
+              </div>
+
+              <div class="ms-field">
+                <label class="ms-label">
+                  <span class="ms-label-text">Description</span>
+                  <span class="ms-label-hint">Optional</span>
+                </label>
+                <%= f.text_area :description, class: "ms-input ms-textarea", placeholder: "What is this calendar for?", rows: 3 %>
+              </div>
+            </div>
+
+            <div class="ms-actions">
+              <%= link_to "Cancel", calendar_path(@calendar), class: "ms-btn ms-btn-ghost" %>
+              <%= f.submit "Save Changes", class: "ms-btn ms-btn-primary" %>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @calendar.ical_token.present? %>
+          <div class="ms-card">
+            <div class="ms-card-section">
+              <h3 class="ms-card-section-title">iCal Feed</h3>
+              <p class="ms-panel-subtitle" style="margin-top: -8px;">Subscribe to this calendar from Apple Calendar, Google Calendar, or any other app.</p>
+
+              <div class="ms-feed-box">
+                <input type="text" value="<%= @calendar.ical_feed_url %>" class="ms-feed-url" readonly id="ical-url">
+                <button type="button" class="ms-feed-copy" onclick="navigator.clipboard.writeText(document.getElementById('ical-url').value); this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000);">
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Scrapers Panel -->
+      <div class="ms-panel" data-settings-tabs-target="panel" data-panel="scrapers">
+        <div class="ms-panel-header">
+          <h2 class="ms-panel-title">Website Scrapers</h2>
+          <p class="ms-panel-subtitle">Automatically import events from websites using CSS selectors.</p>
+        </div>
+
+        <div class="ms-card" data-controller="scrapers">
+          <% if @scrapers.any? %>
+            <div class="ms-card-section">
+              <div class="ms-scraper-list">
+                <% @scrapers.each do |scraper| %>
+                  <div class="ms-scraper-item" id="<%= dom_id(scraper) %>">
+                    <div class="ms-scraper-color" style="background: <%= scraper.color || '#6ee7b7' %>;"></div>
+                    <div class="ms-scraper-body">
+                      <div class="ms-scraper-header">
+                        <span class="ms-scraper-name"><%= scraper.name %></span>
+                        <span class="ms-scraper-badge <%= scraper.enabled? ? 'active' : 'paused' %>">
+                          <%= scraper.enabled? ? 'Active' : 'Paused' %>
+                        </span>
+                      </div>
+                      <div class="ms-scraper-url"><%= scraper.base_url %><%= scraper.list_path %></div>
+                      <div class="ms-scraper-stats">
+                        <% if scraper.last_run_at %>
+                          <span class="ms-scraper-stat">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <%= time_ago_in_words(scraper.last_run_at) %> ago
+                          </span>
+                          <span class="ms-scraper-stat">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                            </svg>
+                            <%= scraper.last_run_count %> events
+                          </span>
+                        <% else %>
+                          <span class="ms-scraper-stat">Never run</span>
+                        <% end %>
+                        <span class="ms-scraper-stat"><%= scraper.total_events_scraped %> total</span>
+                      </div>
+                    </div>
+                    <div class="ms-scraper-actions">
+                      <%= button_to run_calendar_scraper_source_path(@calendar, scraper), method: :post, class: "ms-scraper-btn run", title: "Run now", data: { turbo: false } do %>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      <% end %>
+                      <%= button_to calendar_scraper_source_path(@calendar, scraper), method: :delete, class: "ms-scraper-btn danger", title: "Delete", data: { turbo_confirm: "Delete this scraper?" } do %>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <div class="ms-empty">
+              <div class="ms-empty-icon">🌐</div>
+              <h3>No scrapers yet</h3>
+              <p>Add a scraper to automatically import events from websites.</p>
+              <button type="button" class="ms-btn ms-btn-primary" data-action="click->scrapers#toggleForm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Scraper
+              </button>
+            </div>
+          <% end %>
+
+          <div class="ms-add-form" data-scrapers-target="form">
+            <%= form_with model: [@calendar, @calendar.scraper_sources.build], url: calendar_scraper_sources_path(@calendar) do |f| %>
+              <div class="ms-form-grid">
+                <div class="ms-field">
+                  <%= f.label :name, class: "ms-label" do %><span class="ms-label-text">Scraper Name</span><% end %>
+                  <%= f.text_field :name, class: "ms-input", placeholder: "Local Events", required: true %>
+                </div>
+                <div class="ms-field">
+                  <%= f.label :color, class: "ms-label" do %><span class="ms-label-text">Color</span><% end %>
+                  <%= f.color_field :color, class: "ms-color-swatch", value: "#6ee7b7" %>
+                </div>
+              </div>
+
+              <div class="ms-form-grid">
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Website URL</span></label>
+                  <%= f.url_field :base_url, class: "ms-input", placeholder: "https://example.com", required: true %>
+                </div>
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Events Path</span></label>
+                  <%= f.text_field :list_path, class: "ms-input", placeholder: "/events" %>
+                </div>
+              </div>
+
+              <div class="ms-form-divider">CSS Selectors</div>
+
+              <div class="ms-form-grid">
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Event Links</span></label>
+                  <input type="text" name="scraper_source[selectors][event_links]" class="ms-input" placeholder='a[href*="/event"]'>
+                </div>
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Title</span></label>
+                  <input type="text" name="scraper_source[selectors][title]" class="ms-input" placeholder="h1, .event-title">
+                </div>
+              </div>
+
+              <div class="ms-form-grid">
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Date/Time</span></label>
+                  <input type="text" name="scraper_source[selectors][datetime]" class="ms-input" placeholder="[datetime], time">
+                </div>
+                <div class="ms-field">
+                  <label class="ms-label"><span class="ms-label-text">Location</span></label>
+                  <input type="text" name="scraper_source[selectors][location]" class="ms-input" placeholder=".venue, .address">
+                </div>
+              </div>
+
+              <div class="ms-toggle-row" style="margin-top: 24px;">
+                <div class="ms-toggle-info">
+                  <h4>Enable Automatic Scraping</h4>
+                  <p>Run automatically every few hours</p>
+                </div>
+                <label class="ms-toggle">
+                  <%= f.check_box :enabled, checked: true %>
+                  <span class="ms-toggle-track"></span>
+                </label>
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button type="button" class="ms-btn ms-btn-ghost" data-action="click->scrapers#toggleForm">Cancel</button>
+                <%= f.submit "Add Scraper", class: "ms-btn ms-btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+
+          <% if @scrapers.any? %>
+            <div class="ms-actions">
+              <button type="button" class="ms-btn ms-btn-primary" data-action="click->scrapers#toggleForm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Scraper
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Import Panel -->
+      <div class="ms-panel" data-settings-tabs-target="panel" data-panel="import">
+        <div class="ms-panel-header">
+          <h2 class="ms-panel-title">Calendar Import</h2>
+          <p class="ms-panel-subtitle">Import events from Google Calendar, Apple Calendar, or any iCal feed.</p>
+        </div>
+
+        <%= form_with model: @calendar, url: calendar_import_path(@calendar), method: :patch, data: { controller: "import" } do |f| %>
+          <div class="ms-card">
+            <div class="ms-card-section">
+              <h3 class="ms-card-section-title">Import Source</h3>
+
+              <div class="ms-sources">
+                <label class="ms-source <%= 'selected' if @calendar.import_source == 'google' %>" data-action="click->import#selectSource">
+                  <input type="radio" name="calendar[import_source]" value="google" <%= 'checked' if @calendar.import_source == 'google' %>>
+                  <div class="ms-source-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                  </div>
+                  <span class="ms-source-name">Google</span>
+                </label>
+
+                <label class="ms-source <%= 'selected' if @calendar.import_source == 'apple' %>" data-action="click->import#selectSource">
+                  <input type="radio" name="calendar[import_source]" value="apple" <%= 'checked' if @calendar.import_source == 'apple' %>>
+                  <div class="ms-source-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    </svg>
+                  </div>
+                  <span class="ms-source-name">Apple</span>
+                </label>
+
+                <label class="ms-source <%= 'selected' if @calendar.import_source == 'other' || @calendar.import_source.blank? %>" data-action="click->import#selectSource">
+                  <input type="radio" name="calendar[import_source]" value="other" <%= 'checked' if @calendar.import_source == 'other' || @calendar.import_source.blank? %>>
+                  <div class="ms-source-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </div>
+                  <span class="ms-source-name">Other</span>
+                </label>
+              </div>
+
+              <div class="ms-field">
+                <label class="ms-label">
+                  <span class="ms-label-text">iCal Feed URL</span>
+                </label>
+                <%= f.url_field :import_url, class: "ms-input", placeholder: "https://calendar.google.com/calendar/ical/...", data: { import_target: "url", action: "input->import#detectSource" } %>
+                <p class="ms-hint">
+                  <strong>Google:</strong> Settings → Integrate calendar → Public URL<br>
+                  <strong>Apple:</strong> Calendar app → Share → Copy Link
+                </p>
+              </div>
+
+              <div class="ms-field">
+                <label class="ms-label"><span class="ms-label-text">Sync Interval</span></label>
+                <%= f.select :import_interval_hours, [["Every hour", 1], ["Every 6 hours", 6], ["Every 12 hours", 12], ["Daily", 24]], {}, class: "ms-input ms-select" %>
+              </div>
+
+              <div class="ms-toggle-row">
+                <div class="ms-toggle-info">
+                  <h4>Enable Automatic Import</h4>
+                  <p>Sync events on the schedule above</p>
+                </div>
+                <label class="ms-toggle">
+                  <%= f.check_box :import_enabled %>
+                  <span class="ms-toggle-track"></span>
+                </label>
+              </div>
+
+              <% if @calendar.last_imported_at.present? %>
+                <div class="ms-status <%= 'error' if @calendar.import_error.present? %>">
+                  <span class="ms-status-dot"></span>
+                  <% if @calendar.import_error.present? %>
+                    <span>Sync failed: <%= @calendar.import_error.truncate(60) %></span>
+                  <% else %>
+                    <span>Last synced <%= time_ago_in_words(@calendar.last_imported_at) %> ago (<%= @calendar.events.where(source_name: @calendar.import_source || 'ical').count %> events)</span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="ms-actions">
+              <% if @calendar.import_url.present? %>
+                <%= button_to "Sync Now", sync_calendar_import_path(@calendar), method: :post, class: "ms-btn ms-btn-ghost", data: { turbo: false } %>
+              <% end %>
+              <%= f.submit "Save Settings", class: "ms-btn ms-btn-primary" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </main>
+  </div>
+</div>

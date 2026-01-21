@@ -150,7 +150,7 @@ class EventCreationService
   end
 
   def event_attributes
-    {
+    attrs = {
       title: @params[:title],
       starts_at: parse_datetime(@params[:starts_at]),
       ends_at: parse_datetime(@params[:ends_at]),
@@ -161,6 +161,21 @@ class EventCreationService
       event_type: @params[:event_type] || "social",
       image_url: @params[:image_url]
     }.compact
+
+    # Assign to calendar if specified, or user's default calendar
+    if @source != :scraper
+      attrs[:calendar_id] = @params[:calendar_id] || default_user_calendar&.id
+    end
+
+    attrs
+  end
+
+  def default_user_calendar
+    return nil unless @user
+    @user.calendars.first || @user.calendars.create!(
+      name: "My Calendar",
+      description: "Default calendar"
+    )
   end
 
   def find_or_create_calendar

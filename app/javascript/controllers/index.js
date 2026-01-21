@@ -15,3 +15,12 @@ application.register("post-form", PostFormController)
 
 import ChatController from "./chat_controller"
 application.register("chat", ChatController)
+
+import SettingsTabsController from "./settings_tabs_controller"
+application.register("settings-tabs", SettingsTabsController)
+
+import ScrapersController from "./scrapers_controller"
+application.register("scrapers", ScrapersController)
+
+import ImportController from "./import_controller"
+application.register("import", ImportController)

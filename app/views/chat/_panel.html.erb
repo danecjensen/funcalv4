@@ -1,60 +1,99 @@
-<%# Chat panel component - include in layout or any page %>
-<%# Usage: <%= render "chat/panel" %> %>
+<%# Chat panel component - Luxurious golden-hour conversation experience %>
+<%# Usage: render "chat/panel" %>
 
 <div data-controller="chat"
      data-chat-api-url-value="<%= api_v1_chat_path %>"
      data-chat-open-value="false"
      class="chat-wrapper">
 
-  <%# Toggle button - fixed position %>
+  <%# Floating orb toggle - glowing beacon %>
   <button type="button"
           class="chat-toggle-btn"
           data-action="click->chat#toggle"
           aria-label="Toggle chat assistant">
-    <span class="chat-toggle-icon">💬</span>
-    <span class="chat-toggle-label">Ask AI</span>
+    <span class="chat-toggle-glow"></span>
+    <span class="chat-toggle-orb">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <path d="M8 10h.01M12 10h.01M16 10h.01" stroke-width="3"></path>
+      </svg>
+    </span>
+    <span class="chat-toggle-ripple"></span>
   </button>
 
-  <%# Chat panel - slides in from right %>
+  <%# Chat panel - organic flowing design %>
   <div class="chat-panel hidden" data-chat-target="panel">
+    <%# Decorative background layers %>
+    <div class="chat-panel-bg">
+      <div class="chat-panel-grain"></div>
+      <div class="chat-panel-gradient"></div>
+    </div>
+
+    <%# Header with curved organic shape %>
     <div class="chat-header">
-      <div class="chat-header-title">
-        <span class="chat-header-icon">🤖</span>
-        <div>
-          <h3>Calendar Assistant</h3>
-          <p>Ask me anything about your schedule</p>
+      <div class="chat-header-curve"></div>
+      <div class="chat-header-content">
+        <div class="chat-header-identity">
+          <div class="chat-avatar-ring">
+            <div class="chat-avatar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="chat-header-text">
+            <h3>Soleil</h3>
+            <p class="chat-header-subtitle">Your calendar companion</p>
+          </div>
         </div>
-      </div>
-      <div class="chat-header-actions">
-        <button type="button"
-                class="chat-header-btn"
-                data-action="click->chat#clearHistory"
-                title="Clear conversation">
-          🗑️
-        </button>
-        <button type="button"
-                class="chat-header-btn"
-                data-action="click->chat#close"
-                title="Close">
-          ✕
-        </button>
+        <div class="chat-header-actions">
+          <button type="button"
+                  class="chat-action-btn chat-action-clear"
+                  data-action="click->chat#clearHistory"
+                  title="New conversation">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+          </button>
+          <button type="button"
+                  class="chat-action-btn chat-action-close"
+                  data-action="click->chat#close"
+                  title="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
+    <%# Messages area with organic flow %>
     <div class="chat-messages" data-chat-target="messages">
-      <%# Messages will be added here dynamically %>
       <div class="chat-message chat-message-assistant">
-        <div class="chat-message-avatar">AI</div>
-        <div class="chat-message-content">
-          Hi! I'm your calendar assistant. I can help you:
-          <br><br>
-          • Create events: "Add lunch with Sarah tomorrow at noon"
-          <br>
-          • Find events: "What's happening this weekend?"
-          <br>
-          • Get recommendations: "Find me something fun to do"
-          <br><br>
-          How can I help?
+        <div class="chat-message-avatar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41"></path>
+          </svg>
+        </div>
+        <div class="chat-message-bubble">
+          <p class="chat-greeting">Hello there! I'm <strong>Soleil</strong>, your calendar companion.</p>
+          <div class="chat-capabilities">
+            <div class="chat-capability">
+              <span class="chat-capability-icon">✦</span>
+              <span>Create events naturally</span>
+            </div>
+            <div class="chat-capability">
+              <span class="chat-capability-icon">✦</span>
+              <span>Find what's happening</span>
+            </div>
+            <div class="chat-capability">
+              <span class="chat-capability-icon">✦</span>
+              <span>Discover new experiences</span>
+            </div>
+          </div>
+          <p class="chat-prompt">What would you like to plan?</p>
         </div>
       </div>
     </div>
@@ -62,29 +101,40 @@
     <%# Typing indicator %>
     <div class="chat-typing hidden" data-chat-target="typingIndicator">
       <div class="chat-message chat-message-assistant">
-        <div class="chat-message-avatar">AI</div>
-        <div class="chat-message-content">
-          <span class="typing-dots">
+        <div class="chat-message-avatar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <div class="chat-message-bubble chat-typing-bubble">
+          <span class="typing-wave">
             <span></span><span></span><span></span>
           </span>
         </div>
       </div>
     </div>
 
+    <%# Input area with elegant styling %>
     <form class="chat-form" data-chat-target="form" data-action="submit->chat#submit">
-      <textarea
-        data-chat-target="input"
-        data-action="keydown->chat#handleKeydown"
-        placeholder="Type a message... (Enter to send, Shift+Enter for new line)"
-        rows="1"
-        class="chat-input"
-        autocomplete="off"></textarea>
-      <button type="submit"
-              class="chat-send-btn"
-              data-chat-target="sendButton"
-              aria-label="Send message">
-        ➤
-      </button>
+      <div class="chat-input-wrapper">
+        <textarea
+          data-chat-target="input"
+          data-action="keydown->chat#handleKeydown"
+          placeholder="Ask me anything..."
+          rows="1"
+          class="chat-input"
+          autocomplete="off"></textarea>
+        <button type="submit"
+                class="chat-send-btn"
+                data-chat-target="sendButton"
+                aria-label="Send message">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"></path>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+          </svg>
+        </button>
+      </div>
+      <p class="chat-input-hint">Press <kbd>Enter</kbd> to send</p>
     </form>
   </div>
 </div>

@@ -37,7 +37,7 @@ module Api
       private
 
       def stream_claude_response(user, message, conversation)
-        api_key = Rails.application.credentials.dig(:anthropic, :api_key)
+        api_key = ENV["ANTHROPIC_API_KEY"] || Rails.application.credentials.dig(:anthropic, :api_key)
 
         unless api_key
           send_sse_event({ error: "Claude API key not configured" })
@@ -47,10 +47,65 @@ module Api
         # Build messages array with conversation history
         messages = build_messages(conversation, message)
 
-        # Build the request
+        # Loop to handle tool use - Claude may need multiple turns
+        loop do
+          result = call_claude_api(api_key, user, messages)
+
+          break if result[:error]
+          break unless result[:tool_use]
+
+          # Execute the tool
+          tool_use = result[:tool_use]
+          tool_result = execute_tool(tool_use, user)
+
+          # Add assistant's tool use message and tool result to conversation
+          tool_input = begin
+            JSON.parse(tool_use[:input])
+          rescue JSON::ParserError
+            {}
+          end
+
+          messages << {
+            role: "assistant",
+            content: [
+              {
+                type: "tool_use",
+                id: tool_use[:id],
+                name: tool_use[:name],
+                input: tool_input
+              }
+            ]
+          }
+
+          messages << {
+            role: "user",
+            content: [
+              {
+                type: "tool_result",
+                tool_use_id: tool_use[:id],
+                content: tool_result.to_json
+              }
+            ]
+          }
+
+          # Continue the loop to get Claude's response to the tool result
+        end
+
+        send_sse_event({ done: true })
+      rescue => e
+        Rails.logger.error "Chat streaming error: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+        send_sse_event({ error: "Streaming error: #{e.message}" })
+      end
+
+      def call_claude_api(api_key, user, messages)
         uri = URI.parse(CLAUDE_API_URL)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http.ca_file = ENV["SSL_CERT_FILE"] if ENV["SSL_CERT_FILE"]
+        if Rails.env.development? && !ENV["SSL_CERT_FILE"]
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
         http.read_timeout = 60
 
         request = Net::HTTP::Post.new(uri.path)
@@ -67,22 +122,23 @@ module Api
           stream: true
         }.to_json
 
-        # Stream the response
+        result = { tool_use: nil, error: nil }
+        current_tool_use = nil
+
         http.request(request) do |response|
           unless response.is_a?(Net::HTTPSuccess)
             error_body = response.body
             Rails.logger.error "Claude API error: #{response.code} - #{error_body}"
             send_sse_event({ error: "Claude API error: #{response.code}" })
-            return
+            result[:error] = true
+            return result
           end
 
           buffer = ""
-          current_tool_use = nil
 
           response.read_body do |chunk|
             buffer += chunk
 
-            # Process complete SSE lines
             while (line_end = buffer.index("\n"))
               line = buffer.slice!(0..line_end).strip
 
@@ -94,16 +150,17 @@ module Api
 
               begin
                 event = JSON.parse(data)
-                process_claude_event(event, current_tool_use) do |result|
-                  if result[:tool_use_start]
-                    current_tool_use = result[:tool_use_start]
-                  elsif result[:tool_use_complete]
-                    # Execute the tool and send result
-                    tool_result = execute_tool(current_tool_use, user)
-                    send_sse_event({ tool_result: tool_result })
+                process_claude_event(event, current_tool_use) do |evt_result|
+                  if evt_result[:tool_use_start]
+                    current_tool_use = evt_result[:tool_use_start]
+                  elsif evt_result[:tool_use_complete]
+                    result[:tool_use] = current_tool_use
                     current_tool_use = nil
-                  else
-                    send_sse_event(result)
+                  elsif evt_result[:content]
+                    send_sse_event(evt_result)
+                  elsif evt_result[:error]
+                    send_sse_event(evt_result)
+                    result[:error] = true
                   end
                 end
               rescue JSON::ParserError => e
@@ -113,10 +170,7 @@ module Api
           end
         end
 
-        send_sse_event({ done: true })
-      rescue => e
-        Rails.logger.error "Chat streaming error: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
-        send_sse_event({ error: "Streaming error: #{e.message}" })
+        result
       end
 
       def process_claude_event(event, current_tool_use)
@@ -175,7 +229,8 @@ module Api
             location: input["location"],
             description: input["description"],
             all_day: input["all_day"] || false,
-            event_type: input["event_type"] || "social"
+            event_type: input["event_type"] || "social",
+            calendar_id: input["calendar_id"]
           },
           source: :chat
         )
@@ -199,13 +254,16 @@ module Api
         start_date = input["start_date"] ? Date.parse(input["start_date"]) : Date.today
         end_date = input["end_date"] ? Date.parse(input["end_date"]) : start_date + 7.days
 
-        events = policy_scope(Event)
-          .in_range(start_date, end_date)
+        events = Event
+          .where(starts_at: start_date.beginning_of_day..end_date.end_of_day)
           .order(starts_at: :asc)
           .limit(20)
 
         {
           type: "events_list",
+          date_range: "#{start_date.strftime('%B %d')} to #{end_date.strftime('%B %d, %Y')}",
+          count: events.count,
+          message: events.empty? ? "No events found in this date range." : "Found #{events.count} event(s).",
           events: events.map { |e|
             {
               id: e.id,
@@ -218,7 +276,7 @@ module Api
       end
 
       def search_events_tool(user, input)
-        events = policy_scope(Event)
+        events = Event
           .where("title ILIKE :q OR description ILIKE :q OR venue ILIKE :q", q: "%#{input['query']}%")
           .order(starts_at: :asc)
           .limit(10)
@@ -226,6 +284,8 @@ module Api
         {
           type: "search_results",
           query: input["query"],
+          count: events.count,
+          message: events.empty? ? "No events found matching '#{input['query']}'." : "Found #{events.count} event(s) matching '#{input['query']}'.",
           events: events.map { |e|
             {
               id: e.id,
@@ -293,7 +353,8 @@ module Api
                 location: { type: "string", description: "Event location (optional)" },
                 description: { type: "string", description: "Event description (optional)" },
                 all_day: { type: "boolean", description: "Whether this is an all-day event" },
-                event_type: { type: "string", enum: %w[social meeting workshop community celebration], description: "Type of event" }
+                event_type: { type: "string", enum: %w[social meeting workshop community celebration], description: "Type of event" },
+                calendar_id: { type: "integer", description: "Calendar ID to add the event to (uses default calendar if not specified)" }
               },
               required: ["title", "starts_at"]
             }

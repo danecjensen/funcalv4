@@ -25,12 +25,27 @@
           </div>
         </div>
         <div class="header-actions">
-          <button class="btn-custom btn-custom-secondary">
-            <span>⚙️</span> Settings
-          </button>
-          <button class="btn-custom btn-custom-primary" data-action="click->calendar#openAddEventModal">
-            <span>+</span> Add Event
-          </button>
+          <% if user_signed_in? && current_user.calendars.any? %>
+            <%= link_to edit_calendar_path(@calendar || current_user.calendars.first), class: "btn-custom btn-custom-secondary" do %>
+              <span>⚙️</span> Settings
+            <% end %>
+          <% else %>
+            <button class="btn-custom btn-custom-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+              <span>⚙️</span> Settings
+            </button>
+          <% end %>
+          <% if user_signed_in? %>
+            <%= button_to calendar_index_path, method: :post, class: "btn-custom btn-custom-primary" do %>
+              <span>+</span> Add Calendar
+            <% end %>
+            <%= link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "btn-custom btn-custom-secondary" do %>
+              Sign Out
+            <% end %>
+          <% else %>
+            <%= link_to new_user_session_path, class: "btn-custom btn-custom-primary" do %>
+              <span>+</span> Add Calendar
+            <% end %>
+          <% end %>
         </div>
       </div>
     </header>

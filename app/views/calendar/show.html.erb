@@ -1,4 +1,15 @@
-<div class="calendar-container-custom" data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json, calendar_id: @calendar.id) %>" data-calendar-create-url-value="<%= calendar_index_path %>" data-calendar-calendar-id-value="<%= @calendar.id %>">
+<div data-controller="calendar" data-calendar-events-url-value="<%= events_calendar_index_path(format: :json, calendar_id: @calendar.id) %>" data-calendar-create-url-value="<%= calendar_index_path %>" data-calendar-calendar-id-value="<%= @calendar.id %>">
+
+<div class="calendar-name-header" style="padding: 20px 0; margin-bottom: 10px;">
+  <h1 style="font-family: 'Spectral', Georgia, serif; font-size: 1.75rem; color: var(--text-dark); margin: 0;">
+    <%= @calendar.name %>
+  </h1>
+  <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 4px;">
+    <%= pluralize(@calendar.events.count, 'event') %>
+  </p>
+</div>
+
+<div class="calendar-container-custom">
   <div class="calendar-header">
     <div class="calendar-title">
       <h2 data-calendar-target="currentMonth">January 2026</h2>
@@ -171,4 +182,5 @@
       <button class="btn-custom btn-custom-primary" data-action="click->calendar#createEvent">Create Event</button>
     </div>
   </div>
+</div>
 </div>

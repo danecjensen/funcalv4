@@ -2,8 +2,6 @@ require "icalendar"
 
 module Calendars
   class IcalController < ApplicationController
-    skip_before_action :authenticate_user!
-
     # GET /calendars/:ical_token.ics
     def show
       @calendar = Calendar.find_by!(ical_token: params[:ical_token])

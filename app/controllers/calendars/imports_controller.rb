@@ -1,4 +1,4 @@
-module Calendar
+module Calendars
   class ImportsController < ApplicationController
     before_action :authenticate_user!
     before_action :set_calendar

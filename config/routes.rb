@@ -46,7 +46,7 @@ end
     end
 
     # iCal import
-    resource :import, only: [:update], controller: "calendar/imports" do
+    resource :import, only: [:update], controller: "calendars/imports" do
       post :sync
     end
   end

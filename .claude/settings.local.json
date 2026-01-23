@@ -36,9 +36,16 @@
       "Bash(bin/dev:*)",
       "Bash(bin/rails server:*)",
       "Bash(git remote set-url:*)",
-      "Bash(heroku auth:whoami:*)"
+      "Bash(heroku auth:whoami:*)",
+      "Bash(gh auth:*)",
+      "Bash(heroku apps:info:*)",
+      "Bash(heroku restart:*)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "calendar"
+  ]
 }

@@ -78,7 +78,7 @@ module Api
         events = policy_scope(Event).includes(:post, :calendar)
 
         if params[:q].present?
-          events = events.where("title ILIKE :q OR description ILIKE :q OR venue ILIKE :q OR location ILIKE :q",
+          events = events.where("events.title ILIKE :q OR events.description ILIKE :q OR events.venue ILIKE :q OR events.location ILIKE :q",
                                 q: "%#{params[:q]}%")
         end
 

@@ -17,7 +17,7 @@ if Rails.env.development? || ENV["EVENT_CREATION_PROFILING"] == "true"
         Rails.logger.info "[EventCreation] #{name} (source: #{source}): #{duration_ms}ms"
 
         # Also store for potential aggregation if rack-mini-profiler is present
-        if defined?(Rack::MiniProfiler) && Rack::MiniProfiler.current
+        if defined?(Rack::MiniProfiler) && Rack::MiniProfiler.current&.respond_to?(:record_timing)
           Rack::MiniProfiler.current.record_timing(name, duration_ms)
         end
       end

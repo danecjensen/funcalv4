@@ -2,6 +2,7 @@ module Api
   module V1
     class BaseController < ActionController::API
       include ActionController::Cookies
+      include Pundit::Authorization
 
       before_action :authenticate_api_user!
 
@@ -45,6 +46,11 @@ module Api
 
       def api_user
         current_user || (Rails.env.development? && default_user_for_development)
+      end
+
+      # Pundit uses this to resolve the user for policy_scope / authorize
+      def pundit_user
+        api_user
       end
     end
   end

@@ -18,8 +18,16 @@ module Api
       end
 
       def current_user
-        # Try to get user from Devise session
-        @current_user ||= warden&.user(:user)
+        # Try Bearer token first, then Devise session
+        @current_user ||= user_from_token || warden&.user(:user)
+      end
+
+      def user_from_token
+        header = request.headers["Authorization"]
+        return unless header&.start_with?("Bearer ")
+
+        token = header.split(" ", 2).last
+        User.find_by(api_token: token)
       end
 
       def warden

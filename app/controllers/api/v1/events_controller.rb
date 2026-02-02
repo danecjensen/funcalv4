@@ -102,7 +102,49 @@ module Api
         }
       end
 
+      # GET /api/v1/events/:id/ics
+      def ics
+        event = Event.find(params[:id])
+        authorize event, :show?
+
+        cal = build_single_event_ics(event)
+        render plain: cal.to_ical, content_type: "text/calendar"
+      end
+
       private
+
+      def build_single_event_ics(event)
+        require "icalendar"
+
+        cal = Icalendar::Calendar.new
+        cal.prodid = "-//FunCal//Calendar//EN"
+
+        cal.event do |e|
+          e.uid = "event-#{event.id}@funcal"
+          e.dtstart = format_ics_datetime(event.starts_at, event.all_day)
+          e.dtend = format_ics_datetime(event.ends_at || event.starts_at + 1.hour, event.all_day)
+          e.summary = event.title
+          e.description = event.description if event.description.present?
+          e.location = [event.venue, event.location].compact.join(", ") if event.venue.present? || event.location.present?
+          e.url = event.source_url if event.source_url.present?
+          e.created = event.created_at
+          e.last_modified = event.updated_at
+          e.categories = [event.event_type.upcase] if event.event_type.present?
+        end
+
+        cal.publish
+        cal
+      end
+
+      def format_ics_datetime(datetime, all_day)
+        return nil unless datetime
+
+        if all_day
+          Icalendar::Values::Date.new(datetime.to_date)
+        else
+          Icalendar::Values::DateTime.new(datetime.utc, "tzid" => "UTC")
+        end
+      end
 
       def event_params
         params.require(:event).permit(

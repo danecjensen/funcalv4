@@ -139,41 +139,52 @@
     </div>
     <div class="modal-body-custom">
       <form data-calendar-target="addEventForm">
+        <!-- Required Fields -->
         <div class="form-group">
-          <label>Event Title</label>
+          <label>Event Title <span class="text-danger">*</span></label>
           <input type="text" name="title" placeholder="Holiday Potluck Dinner" required data-calendar-target="newEventTitle">
-        </div>
-
-        <div class="form-group">
-          <label>Event Type</label>
-          <select name="event_type" required data-calendar-target="newEventType">
-            <option value="social">Social</option>
-            <option value="meeting">Meeting</option>
-            <option value="workshop">Workshop</option>
-            <option value="community">Community</option>
-            <option value="celebration">Celebration</option>
-          </select>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Date</label>
+            <label>Date <span class="text-danger">*</span></label>
             <input type="date" name="date" required data-calendar-target="newEventDate">
           </div>
           <div class="form-group">
-            <label>Time</label>
-            <input type="time" name="time" required data-calendar-target="newEventTime">
+            <label>Time <span class="text-danger">*</span></label>
+            <select name="time" required data-calendar-target="newEventTime" class="form-select">
+              <option value="">Select time</option>
+              <% time_slot_options.each do |display, value| %>
+                <option value="<%= value %>"><%= display %></option>
+              <% end %>
+            </select>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Location</label>
-          <input type="text" name="location" placeholder="Community Hall" data-calendar-target="newEventLocation">
-        </div>
+        <!-- Optional Fields -->
+        <div class="optional-fields mt-4 pt-3 border-top">
+          <p class="text-muted small mb-3">Optional details</p>
 
-        <div class="form-group">
-          <label>Description</label>
-          <textarea name="description" placeholder="Tell everyone about your event..." data-calendar-target="newEventDescription"></textarea>
+          <div class="form-group">
+            <label class="form-label-optional">Event Type</label>
+            <select name="event_type" data-calendar-target="newEventType">
+              <option value="social">Social</option>
+              <option value="meeting">Meeting</option>
+              <option value="workshop">Workshop</option>
+              <option value="community">Community</option>
+              <option value="celebration">Celebration</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-optional">Location</label>
+            <input type="text" name="location" placeholder="Where is this happening?" data-calendar-target="newEventLocation">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-optional">Description</label>
+            <textarea name="description" placeholder="Tell everyone about your event..." data-calendar-target="newEventDescription"></textarea>
+          </div>
         </div>
       </form>
     </div>

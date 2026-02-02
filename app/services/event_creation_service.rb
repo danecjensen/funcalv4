@@ -25,6 +25,11 @@ class EventCreationService
     new(**args).call
   end
 
+  # Instrumentation helper for performance profiling
+  def self.instrument(name, payload = {}, &block)
+    ActiveSupport::Notifications.instrument("event_creation.#{name}", payload, &block)
+  end
+
   def initialize(user:, params:, source: :manual, skip_deduplication: false)
     @user = user
     @params = params.to_h.with_indifferent_access
@@ -35,40 +40,44 @@ class EventCreationService
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      # Check for duplicates (scraped events only by default)
-      if should_check_duplicates?
-        existing = find_duplicate
-        if existing
-          return Result.new(
-            success?: true,
-            event: existing,
-            post: existing.post,
-            errors: [],
-            duplicate?: true
-          )
+    self.class.instrument("total", source: @source) do
+      ActiveRecord::Base.transaction do
+        # Check for duplicates (scraped events only by default)
+        if should_check_duplicates?
+          existing = self.class.instrument("dedup_check") { find_duplicate }
+          if existing
+            return Result.new(
+              success?: true,
+              event: existing,
+              post: existing.post,
+              errors: [],
+              duplicate?: true
+            )
+          end
         end
-      end
 
-      event = build_event
+        event = self.class.instrument("build_event", source: @source) { build_event }
 
-      if event.save
-        Result.new(
-          success?: true,
-          event: event,
-          post: event.post,
-          errors: [],
-          duplicate?: false
-        )
-      else
-        raise ActiveRecord::Rollback
-        Result.new(
-          success?: false,
-          event: nil,
-          post: nil,
-          errors: event.errors.full_messages,
-          duplicate?: false
-        )
+        self.class.instrument("save") do
+          if event.save
+            Result.new(
+              success?: true,
+              event: event,
+              post: event.post,
+              errors: [],
+              duplicate?: false
+            )
+          else
+            raise ActiveRecord::Rollback
+            Result.new(
+              success?: false,
+              event: nil,
+              post: nil,
+              errors: event.errors.full_messages,
+              duplicate?: false
+            )
+          end
+        end
       end
     end
   rescue ActiveRecord::RecordInvalid => e
@@ -150,10 +159,16 @@ class EventCreationService
   end
 
   def event_attributes
+    starts_at = normalize_to_half_hour(parse_datetime(@params[:starts_at]))
+    ends_at = normalize_to_half_hour(parse_datetime(@params[:ends_at]))
+
+    # Default end time to 1 hour after start if not provided
+    ends_at ||= starts_at + 1.hour if starts_at
+
     attrs = {
       title: @params[:title],
-      starts_at: parse_datetime(@params[:starts_at]),
-      ends_at: parse_datetime(@params[:ends_at]),
+      starts_at: starts_at,
+      ends_at: ends_at,
       location: @params[:location],
       venue: @params[:venue],
       description: @params[:description],
@@ -197,6 +212,28 @@ class EventCreationService
     Time.zone.parse(value.to_s)
   rescue ArgumentError, TypeError
     nil
+  end
+
+  # Normalize times to nearest :00 or :30
+  # This ensures consistent time slots in the calendar UI
+  def normalize_to_half_hour(time)
+    return nil if time.nil?
+
+    minutes = time.min
+    normalized_minutes = if minutes < 15
+                           0
+                         elsif minutes < 45
+                           30
+                         else
+                           0
+                         end
+
+    # Handle hour rollover when rounding up from :45+
+    if minutes >= 45
+      time.change(min: 0, sec: 0) + 1.hour
+    else
+      time.change(min: normalized_minutes, sec: 0)
+    end
   end
 
   def generate_source_id

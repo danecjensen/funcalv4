@@ -639,6 +639,197 @@ body.modal-open { overflow: hidden; }
   gap: 16px;
 }
 
+// Optional Fields Section
+.optional-fields {
+  border-top-color: var(--border-color);
+
+  .form-group label {
+    color: var(--text-medium);
+    font-weight: 500;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: var(--color-warm-bg);
+    border-color: transparent;
+
+    &:focus {
+      background: white;
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+.form-label-optional {
+  color: var(--text-medium) !important;
+  font-weight: 500 !important;
+
+  &::after {
+    content: " (optional)";
+    font-weight: 400;
+    font-size: 0.8125rem;
+    color: var(--text-light);
+  }
+}
+
+// Required field indicator
+.text-danger {
+  color: var(--color-coral, #d4836a);
+}
+
+// ============================================
+// DEMO PAGE STYLES
+// ============================================
+
+.demo-hero {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 40px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.demo-hero-content {
+  flex: 1;
+  min-width: 280px;
+}
+
+.demo-hero h1 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.demo-tagline {
+  color: var(--text-medium);
+  font-size: 1.125rem;
+  margin: 0 0 20px;
+  max-width: 500px;
+}
+
+.demo-event-count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.demo-event-count span:first-child {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.demo-event-count-label {
+  color: var(--text-light);
+  font-size: 0.9375rem;
+}
+
+.demo-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+// Demo calendar cards
+.demo-calendars-section {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 40px;
+}
+
+.demo-calendars-section h3 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+}
+
+.demo-calendars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.demo-calendar-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--color-primary);
+  transition: all 0.2s ease;
+}
+
+.demo-calendar-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.demo-calendar-card h4 {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+}
+
+.demo-calendar-card p {
+  color: var(--text-medium);
+  font-size: 0.875rem;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.demo-calendar-card .event-count {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Demo event badge on chips
+.event-chip.demo-event {
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+// Danger button for delete
+.btn-custom-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-custom-danger:hover {
+  background: #c82333;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .demo-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 24px;
+  }
+
+  .demo-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .demo-calendars-section {
+    padding: 0 20px;
+    margin: 20px auto;
+  }
+}
+
 // Animations
 @keyframes slideInUp {
   from { opacity: 0; transform: translateY(20px); }

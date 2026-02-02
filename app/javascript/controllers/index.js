@@ -24,3 +24,6 @@ application.register("scrapers", ScrapersController)
 
 import ImportController from "./import_controller"
 application.register("import", ImportController)
+
+import DemoCalendarController from "./demo_calendar_controller"
+application.register("demo-calendar", DemoCalendarController)

@@ -13,7 +13,20 @@ authenticate :user, lambda { |u| u.admin? } do
 end
 
   # Authentication
-  devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks" }
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks",
+    registrations: "users/registrations"
+  }
+
+  # Demo Calendar (public, session-based)
+  namespace :demo do
+    root to: "calendars#show"
+    get :events, to: "calendars#events"
+    resources :events, only: [:create, :destroy]
+    resource :calendar, only: [:show] do
+      post :persist
+    end
+  end
 
   # Timeline (root)
   root to: "posts#index"
@@ -71,8 +84,12 @@ end
         collection do
           get :search
         end
+        member do
+          get :ics
+        end
       end
       resources :calendars, only: [:index, :show]
+      resource :api_token, only: [:create, :destroy]
       post :chat, to: "chat#create"
     end
   end

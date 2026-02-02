@@ -40,7 +40,15 @@
       "Bash(gh auth:*)",
       "Bash(heroku apps:info:*)",
       "Bash(heroku restart:*)",
-      "Bash(heroku ps)"
+      "Bash(heroku ps)",
+      "Bash(heroku certs:info:*)",
+      "Bash(heroku domains:*)",
+      "Bash(heroku certs:auto:*)",
+      "Bash(heroku domains:info:*)",
+      "Bash(dig:*)",
+      "Bash(host:*)",
+      "Bash(grep:*)",
+      "Bash(ruby -c:*)"
     ],
     "deny": [],
     "ask": []

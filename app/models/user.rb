@@ -6,6 +6,8 @@ class User < ApplicationRecord
   devise :omniauthable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  has_secure_token :api_token
+
   has_many :posts, foreign_key: :creator_id, dependent: :destroy
   has_many :comments, foreign_key: :creator_id, dependent: :destroy
   has_many :likes, dependent: :destroy

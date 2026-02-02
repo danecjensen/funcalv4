@@ -1,0 +1,174 @@
+<div data-controller="demo-calendar" data-demo-calendar-events-url-value="<%= demo_events_path(format: :json) %>" data-demo-calendar-create-url-value="<%= demo_events_path %>">
+
+<div class="demo-hero">
+  <div class="demo-hero-content">
+    <h1>Try FunCal - No Sign Up Required</h1>
+    <p class="demo-tagline">Create events, explore the calendar, and save your work when you're ready.</p>
+    <div class="demo-event-count">
+      <span data-demo-calendar-target="eventCount"><%= session.dig(:demo_calendar, "events")&.size || 0 %></span>
+      <span class="demo-event-count-label">events in your demo calendar</span>
+    </div>
+  </div>
+  <div class="demo-actions">
+    <% if user_signed_in? %>
+      <%= link_to "Go to My Calendars", calendar_index_path, class: "btn-custom btn-custom-primary" %>
+    <% else %>
+      <%= button_to "Save My Calendar", demo_calendar_persist_path, method: :post, class: "btn-custom btn-custom-primary", disabled: session.dig(:demo_calendar, "events").blank? %>
+      <%= link_to "Sign In", new_user_session_path, class: "btn-custom btn-custom-secondary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="calendar-container-custom">
+  <div class="calendar-header">
+    <div class="calendar-title">
+      <h2 data-demo-calendar-target="currentMonth">January 2026</h2>
+      <div class="month-nav">
+        <button data-action="click->demo-calendar#prevMonth">‹</button>
+        <button data-action="click->demo-calendar#nextMonth">›</button>
+      </div>
+    </div>
+    <div class="view-toggle">
+      <button class="active">Month</button>
+      <button>Week</button>
+      <button>List</button>
+    </div>
+  </div>
+
+  <div class="calendar-grid">
+    <div class="calendar-weekdays">
+      <div class="weekday">Sun</div>
+      <div class="weekday">Mon</div>
+      <div class="weekday">Tue</div>
+      <div class="weekday">Wed</div>
+      <div class="weekday">Thu</div>
+      <div class="weekday">Fri</div>
+      <div class="weekday">Sat</div>
+    </div>
+    <div class="calendar-days" data-demo-calendar-target="calendarDays"></div>
+  </div>
+</div>
+
+<!-- Published Demo Calendars -->
+<% if @demo_calendars.present? %>
+<div class="demo-calendars-section">
+  <h3>Explore Community Calendars</h3>
+  <div class="demo-calendars-grid">
+    <% @demo_calendars.each do |calendar| %>
+      <div class="demo-calendar-card" style="border-left-color: <%= calendar.color %>;">
+        <h4><%= calendar.name %></h4>
+        <p><%= calendar.description || "Community calendar" %></p>
+        <span class="event-count"><%= pluralize(calendar.events.count, 'event') %></span>
+      </div>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" data-demo-calendar-target="eventModal" aria-hidden="true">
+  <div class="modal-custom" role="dialog" aria-modal="true">
+    <div class="modal-header-custom">
+      <div class="modal-header-content">
+        <span class="event-type-badge" data-demo-calendar-target="modalEventType">Social</span>
+        <h2 data-demo-calendar-target="modalEventTitle">Event Title</h2>
+        <div class="event-meta">
+          <div class="event-meta-item">
+            <span>📅</span>
+            <span data-demo-calendar-target="modalEventDate">Date</span>
+          </div>
+          <div class="event-meta-item">
+            <span>🕐</span>
+            <span data-demo-calendar-target="modalEventTime">Time</span>
+          </div>
+          <div class="event-meta-item">
+            <span>📍</span>
+            <span data-demo-calendar-target="modalEventLocation">Location</span>
+          </div>
+        </div>
+      </div>
+      <button class="close-modal" data-action="click->demo-calendar#closeEventModal" aria-label="Close">×</button>
+    </div>
+
+    <div class="modal-body-custom">
+      <div class="event-section">
+        <h3>About This Event</h3>
+        <p class="event-description" data-demo-calendar-target="modalEventDescription"></p>
+      </div>
+    </div>
+
+    <div class="modal-footer-custom">
+      <button class="btn-custom btn-custom-secondary" data-action="click->demo-calendar#closeEventModal">Close</button>
+      <button class="btn-custom btn-custom-danger" data-action="click->demo-calendar#deleteEvent" data-demo-calendar-target="deleteEventBtn" style="display: none;">Delete Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event Modal -->
+<div class="modal-overlay" data-demo-calendar-target="addEventModal" aria-hidden="true">
+  <div class="modal-custom" role="dialog" aria-modal="true">
+    <div class="modal-header-custom">
+      <div class="modal-header-content">
+        <h2>Create New Event</h2>
+        <p class="text-muted small">Try it out - no sign up needed!</p>
+      </div>
+      <button class="close-modal" data-action="click->demo-calendar#closeAddEventModal" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body-custom">
+      <form data-demo-calendar-target="addEventForm">
+        <!-- Required Fields -->
+        <div class="form-group">
+          <label>Event Title <span class="text-danger">*</span></label>
+          <input type="text" name="title" placeholder="Holiday Potluck Dinner" required data-demo-calendar-target="newEventTitle">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date <span class="text-danger">*</span></label>
+            <input type="date" name="date" required data-demo-calendar-target="newEventDate">
+          </div>
+          <div class="form-group">
+            <label>Time <span class="text-danger">*</span></label>
+            <select name="time" required data-demo-calendar-target="newEventTime" class="form-select">
+              <option value="">Select time</option>
+              <% time_slot_options.each do |display, value| %>
+                <option value="<%= value %>"><%= display %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+
+        <!-- Optional Fields -->
+        <div class="optional-fields mt-4 pt-3 border-top">
+          <p class="text-muted small mb-3">Optional details</p>
+
+          <div class="form-group">
+            <label class="form-label-optional">Event Type</label>
+            <select name="event_type" data-demo-calendar-target="newEventType">
+              <option value="social">Social</option>
+              <option value="meeting">Meeting</option>
+              <option value="workshop">Workshop</option>
+              <option value="community">Community</option>
+              <option value="celebration">Celebration</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-optional">Location</label>
+            <input type="text" name="location" placeholder="Where is this happening?" data-demo-calendar-target="newEventLocation">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-optional">Description</label>
+            <textarea name="description" placeholder="Tell everyone about your event..." data-demo-calendar-target="newEventDescription"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer-custom">
+      <button class="btn-custom btn-custom-secondary" data-action="click->demo-calendar#closeAddEventModal">Cancel</button>
+      <button class="btn-custom btn-custom-primary" data-action="click->demo-calendar#createEvent">Create Event</button>
+    </div>
+  </div>
+</div>
+</div>

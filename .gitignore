@@ -41,3 +41,6 @@
 .env
 
 /config/credentials/development.key
+
+# Playwright MCP artifacts
+/.playwright-mcp/

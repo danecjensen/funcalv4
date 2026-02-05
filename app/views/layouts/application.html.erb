@@ -17,13 +17,13 @@
   <body>
     <header class="site-header">
       <div class="header-content">
-        <div class="logo">
+        <%= link_to (user_signed_in? ? profile_path : root_path), class: "logo", style: "text-decoration: none; color: inherit;" do %>
           <div class="logo-icon">📅</div>
           <div class="logo-text">
             <h1>Community Calendar</h1>
             <p>120 Members</p>
           </div>
-        </div>
+        <% end %>
         <div class="header-actions">
           <% if user_signed_in? && current_user.calendars.any? %>
             <%= link_to edit_calendar_path(@calendar || current_user.calendars.first), class: "btn-custom btn-custom-secondary" do %>

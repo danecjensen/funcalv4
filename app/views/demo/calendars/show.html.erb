@@ -13,7 +13,7 @@
     <% if user_signed_in? %>
       <%= link_to "Go to My Calendars", calendar_index_path, class: "btn-custom btn-custom-primary" %>
     <% else %>
-      <%= button_to "Save My Calendar", demo_calendar_persist_path, method: :post, class: "btn-custom btn-custom-primary", disabled: session.dig(:demo_calendar, "events").blank? %>
+      <%= button_to "Save My Calendar", persist_demo_calendar_path, method: :post, class: "btn-custom btn-custom-primary", disabled: session.dig(:demo_calendar, "events").blank? %>
       <%= link_to "Sign In", new_user_session_path, class: "btn-custom btn-custom-secondary" %>
     <% end %>
   </div>

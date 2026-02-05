@@ -280,6 +280,16 @@ Devise.setup do |config|
     end
   end
 
+  # Google OAuth2 for sign-in + calendar access
+  google_client_id = env_creds.dig(:google, :app_id) || ENV["GOOGLE_CLIENT_ID"]
+  google_client_secret = env_creds.dig(:google, :app_secret) || ENV["GOOGLE_CLIENT_SECRET"]
+  if google_client_id.present? && google_client_secret.present?
+    config.omniauth :google_oauth2, google_client_id, google_client_secret,
+      scope: "email,profile,https://www.googleapis.com/auth/calendar.readonly",
+      access_type: "offline",
+      prompt: "consent"
+  end
+
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.

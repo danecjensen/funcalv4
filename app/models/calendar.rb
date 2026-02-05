@@ -14,7 +14,20 @@ class Calendar < ApplicationRecord
 
   # Import helpers
   def import_enabled?
+    return import_enabled if google?
     import_enabled && import_url.present?
+  end
+
+  def google?
+    import_source == "google"
+  end
+
+  def apple?
+    import_source == "apple"
+  end
+
+  def external?
+    import_source.present?
   end
 
   def needs_import_sync?

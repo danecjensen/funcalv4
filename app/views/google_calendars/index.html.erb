@@ -1,0 +1,45 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="d-flex align-items-center mb-4">
+        <%= link_to calendar_connections_path, class: "text-muted me-3" do %>
+          &larr; Back
+        <% end %>
+        <h3 class="mb-0">Select Google Calendars</h3>
+      </div>
+
+      <p class="text-muted mb-4">Choose which Google Calendars to sync with FunCal. Events will be imported automatically.</p>
+
+      <%= form_with url: google_calendars_path, method: :post, local: true do |f| %>
+        <div class="list-group mb-4">
+          <% @google_calendars.each do |gcal| %>
+            <label class="list-group-item d-flex align-items-center">
+              <% already_synced = @existing_source_ids.include?(gcal.id) %>
+              <input type="checkbox"
+                     name="calendar_ids[]"
+                     value="<%= gcal.id %>"
+                     class="form-check-input me-3"
+                     <%= "checked disabled" if already_synced %>>
+              <span class="rounded-circle d-inline-block me-2"
+                    style="width: 14px; height: 14px; background-color: <%= gcal.background_color || '#3788d8' %>;"></span>
+              <div class="flex-grow-1">
+                <strong><%= gcal.summary %></strong>
+                <% if gcal.description.present? %>
+                  <br><small class="text-muted"><%= truncate(gcal.description, length: 80) %></small>
+                <% end %>
+              </div>
+              <% if already_synced %>
+                <span class="badge bg-success">Synced</span>
+              <% end %>
+            </label>
+          <% end %>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <%= link_to "Cancel", calendar_connections_path, class: "btn btn-outline-secondary" %>
+          <%= f.submit "Sync Selected Calendars", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

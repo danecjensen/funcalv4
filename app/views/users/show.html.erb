@@ -38,6 +38,80 @@
   </div>
 
   <div class="col-lg-8">
+    <% if user_signed_in? && @user == current_user %>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">My Calendars</h4>
+        <div class="d-flex gap-2">
+          <%= link_to calendar_connections_path, class: "btn btn-outline-primary btn-sm" do %>
+            Connect Calendar
+          <% end %>
+          <%= link_to "New Calendar", calendar_index_path, method: :post, class: "btn btn-primary btn-sm" %>
+        </div>
+      </div>
+
+      <% if @calendars.any? %>
+        <div class="row g-3 mb-4">
+          <% @calendars.each do |calendar| %>
+            <div class="col-md-6">
+              <%= link_to calendar_path(calendar), class: "text-decoration-none" do %>
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <span class="rounded-circle d-inline-block me-2" style="width: 14px; height: 14px; background-color: <%= calendar.color || '#3788d8' %>;"></span>
+                      <h5 class="card-title mb-0 text-dark"><%= calendar.name %></h5>
+                      <% if calendar.google? %>
+                        <span class="badge bg-light text-dark ms-2" title="Google Calendar">G</span>
+                      <% elsif calendar.apple? %>
+                        <span class="badge bg-light text-dark ms-2" title="Apple Calendar">A</span>
+                      <% elsif calendar.import_source == "ical" %>
+                        <span class="badge bg-light text-dark ms-2" title="iCal Feed">iCal</span>
+                      <% end %>
+                    </div>
+                    <% if calendar.description.present? %>
+                      <p class="card-text text-muted small mb-2"><%= truncate(calendar.description, length: 80) %></p>
+                    <% end %>
+                    <div class="d-flex align-items-center justify-content-between">
+                      <span class="text-muted small"><%= pluralize(calendar.events.size, 'event') %></span>
+                      <% if calendar.external? && calendar.import_enabled? %>
+                        <span class="text-muted small">
+                          <% if calendar.import_error.present? %>
+                            <span class="text-danger" title="<%= calendar.import_error %>">Sync error</span>
+                          <% elsif calendar.last_imported_at.present? %>
+                            Synced <%= time_ago_in_words(calendar.last_imported_at) %> ago
+                          <% else %>
+                            Syncing...
+                          <% end %>
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+                  <% if calendar.external? && calendar.import_enabled? %>
+                    <div class="card-footer bg-transparent border-top-0 pt-0">
+                      <% if calendar.google? %>
+                        <%= button_to "Sync Now", refresh_google_calendar_path(calendar), method: :post, class: "btn btn-outline-secondary btn-sm", form: { data: { turbo: false } } %>
+                      <% else %>
+                        <%= button_to "Sync Now", sync_calendar_import_path(calendar), method: :post, class: "btn btn-outline-secondary btn-sm", form: { data: { turbo: false } } %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="card mb-4">
+          <div class="card-body text-center text-muted py-4">
+            <p class="mb-2">You don't have any calendars yet.</p>
+            <div class="d-flex gap-2 justify-content-center">
+              <%= link_to "Create your first calendar", calendar_index_path, method: :post, class: "btn btn-outline-primary btn-sm" %>
+              <%= link_to "Connect external calendar", calendar_connections_path, class: "btn btn-outline-secondary btn-sm" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
     <h4 class="mb-3">Posts by <%= @user.display_name %></h4>
 
     <% if @posts.any? %>

@@ -4,6 +4,7 @@
   - default
   - mailers
   - scrapers
+  - imports
 
 # Sidekiq Scheduler configuration
 # These jobs run on a schedule
@@ -14,5 +15,8 @@
     queue: scrapers
     description: "Scrape all enabled event sources"
 
-  # Individual source schedules can be added here if needed
-  # or managed dynamically via ScraperSource records
+  scheduled_ical_import:
+    cron: '0 * * * *'  # Every hour
+    class: ScheduledIcalImportJob
+    queue: imports
+    description: "Sync all enabled calendar imports (iCal, Google, Apple)"

@@ -12,6 +12,25 @@ module Users
       handle_oauth("Twitter")
     end
 
+    def google_oauth2
+      auth = request.env["omniauth.auth"]
+
+      if user_signed_in?
+        # Already signed in — save/update OAuth tokens for calendar access
+        service = current_user.services.find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+        service.update!(
+          access_token: auth.credentials.token,
+          refresh_token: auth.credentials.refresh_token || service.refresh_token,
+          expires_at: auth.credentials.expires_at ? Time.at(auth.credentials.expires_at) : nil,
+          auth: auth.to_json
+        )
+        redirect_to google_calendars_path, notice: "Google account connected. Choose calendars to sync."
+      else
+        # Not signed in — standard sign-in/sign-up flow
+        handle_oauth("Google")
+      end
+    end
+
     def failure
       redirect_to root_path, alert: "Authentication failed. Please try again."
     end

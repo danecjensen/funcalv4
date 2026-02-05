@@ -7,8 +7,13 @@ class ScheduledIcalImportJob < ApplicationJob
     Calendar.where(import_enabled: true).find_each do |calendar|
       next unless calendar.needs_import_sync?
 
-      Rails.logger.info "[ScheduledIcalImportJob] Queueing import for calendar #{calendar.id}"
-      IcalImportJob.perform_later(calendar.id)
+      Rails.logger.info "[ScheduledIcalImportJob] Queueing import for calendar #{calendar.id} (source: #{calendar.import_source})"
+
+      if calendar.google?
+        GoogleCalendarImportJob.perform_later(calendar.id)
+      else
+        IcalImportJob.perform_later(calendar.id)
+      end
     end
   end
 end

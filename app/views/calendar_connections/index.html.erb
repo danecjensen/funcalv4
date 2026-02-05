@@ -1,0 +1,110 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="d-flex align-items-center mb-4">
+        <%= link_to profile_path, class: "text-muted me-3" do %>
+          &larr; Back to Profile
+        <% end %>
+        <h3 class="mb-0">Connect External Calendar</h3>
+      </div>
+
+      <%# Google Calendar %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <div class="me-3" style="font-size: 1.5rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect width="24" height="24" rx="4" fill="#4285F4"/>
+                  <path d="M18 8.5H6v9h12v-9z" fill="#fff"/>
+                  <path d="M6 6.5h12v2H6z" fill="#EA4335"/>
+                  <rect x="8" y="10" width="3" height="2" rx="0.5" fill="#4285F4"/>
+                  <rect x="13" y="10" width="3" height="2" rx="0.5" fill="#4285F4"/>
+                  <rect x="8" y="13.5" width="3" height="2" rx="0.5" fill="#4285F4"/>
+                  <rect x="13" y="13.5" width="3" height="2" rx="0.5" fill="#4285F4"/>
+                </svg>
+              </div>
+              <div>
+                <h5 class="mb-0">Google Calendar</h5>
+                <small class="text-muted">One-click connect with your Google account</small>
+              </div>
+            </div>
+            <% if !@google_configured %>
+              <span class="badge bg-secondary">Not configured</span>
+            <% elsif @google_connected %>
+              <%= link_to "Choose Calendars", google_calendars_path, class: "btn btn-outline-primary btn-sm" %>
+            <% else %>
+              <%= button_to "Connect with Google", omniauth_authorize_path(:user, :google_oauth2), data: { turbo: false }, class: "btn btn-primary btn-sm" %>
+            <% end %>
+          </div>
+          <% if !@google_configured %>
+            <hr class="my-3">
+            <small class="text-muted">Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables to enable.</small>
+          <% elsif @google_calendars.any? %>
+            <hr class="my-3">
+            <small class="text-muted">Synced: <%= @google_calendars.map(&:name).join(", ") %></small>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Apple Calendar %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <div class="me-3" style="font-size: 1.5rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect width="24" height="24" rx="4" fill="#FF3B30"/>
+                  <text x="12" y="17" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">31</text>
+                </svg>
+              </div>
+              <div>
+                <h5 class="mb-0">Apple Calendar</h5>
+                <small class="text-muted">Share a public iCal link from your Mac or iCloud</small>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal" data-bs-target="#appleWizardModal">
+              Set Up Apple Calendar
+            </button>
+          </div>
+          <% if @apple_calendars.any? %>
+            <hr class="my-3">
+            <small class="text-muted">Synced: <%= @apple_calendars.map(&:name).join(", ") %></small>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Other iCal Feed %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="me-3" style="font-size: 1.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect width="24" height="24" rx="4" fill="#6c757d"/>
+                <path d="M8 7h8M8 12h8M8 17h5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h5 class="mb-0">Other iCal Feed</h5>
+              <small class="text-muted">Any calendar with a public .ics URL</small>
+            </div>
+          </div>
+          <%= form_with url: calendar_connections_path, method: :post, local: true, class: "mt-2" do |f| %>
+            <%= f.hidden_field :source, value: "ical" %>
+            <div class="mb-2">
+              <input type="text" name="name" class="form-control form-control-sm" placeholder="Calendar name (optional)">
+            </div>
+            <div class="input-group">
+              <input type="url" name="import_url" class="form-control form-control-sm"
+                     placeholder="https://example.com/calendar.ics" required>
+              <%= f.submit "Add Feed", class: "btn btn-outline-primary btn-sm" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render "calendar_connections/apple_wizard" %>

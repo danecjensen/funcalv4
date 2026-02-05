@@ -1,9 +1,14 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:show]
-  before_action :set_user
+  before_action :set_user, except: [:profile]
+
+  def profile
+    redirect_to user_path(current_user)
+  end
 
   def show
     @posts = @user.posts.includes(:event, :likes, :comments).recent
+    @calendars = @user.calendars.includes(:events)
   end
 
   def edit

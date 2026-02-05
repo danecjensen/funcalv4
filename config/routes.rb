@@ -67,7 +67,16 @@ end
   # iCal feed (public, token-based access)
   get "calendars/:ical_token.ics", to: "calendars/ical#show", as: :calendar_ical_feed, format: :ics
 
+  # External calendar connections
+  resources :google_calendars, only: [:index, :create, :destroy] do
+    member do
+      post :refresh
+    end
+  end
+  resources :calendar_connections, only: [:index, :create]
+
   # User profiles
+  get "profile", to: "users#profile", as: :profile
   resources :users, only: [:show, :edit, :update]
 
   # Existing

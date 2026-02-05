@@ -27,3 +27,6 @@ application.register("import", ImportController)
 
 import DemoCalendarController from "./demo_calendar_controller"
 application.register("demo-calendar", DemoCalendarController)
+
+import AppleWizardController from "./apple_wizard_controller"
+application.register("apple-wizard", AppleWizardController)

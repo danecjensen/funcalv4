@@ -96,3 +96,8 @@ gem "webdrivers"
 
 # iCal support
 gem "icalendar"
+
+# Google Calendar OAuth + API
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-rails_csrf_protection"
+gem "google-apis-calendar_v3", "~> 0.48"

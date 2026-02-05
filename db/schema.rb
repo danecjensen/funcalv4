@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_02_184034) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_04_103558) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -95,7 +95,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_02_184034) do
     t.boolean "import_enabled", default: false
     t.integer "import_interval_hours", default: 6
     t.text "import_error"
+    t.string "import_source_id"
     t.index ["ical_token"], name: "index_calendars_on_ical_token", unique: true
+    t.index ["user_id", "import_source", "import_source_id"], name: "idx_calendars_external_source", unique: true, where: "((import_source IS NOT NULL) AND (import_source_id IS NOT NULL))"
     t.index ["user_id", "name"], name: "index_calendars_on_user_id_and_name"
     t.index ["user_id"], name: "index_calendars_on_user_id"
   end

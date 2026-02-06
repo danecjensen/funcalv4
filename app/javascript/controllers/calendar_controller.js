@@ -26,7 +26,14 @@ export default class extends Controller {
     "newEventDate",
     "newEventTime",
     "newEventLocation",
-    "newEventDescription"
+    "newEventDescription",
+    "monthView",
+    "weekView",
+    "listView",
+    "monthBtn",
+    "weekBtn",
+    "listBtn",
+    "calendarGrid"
   ]
 
   static values = {
@@ -38,10 +45,13 @@ export default class extends Controller {
   connect() {
     this.currentDate = new Date()
     this.events = []
+    this.currentView = 'month'
     this.monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ]
+    this.dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    this.shortDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
     this.fetchEventsAndRender()
     this.setupEventListeners()
@@ -209,6 +219,223 @@ export default class extends Controller {
   nextMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1)
     this.fetchEventsAndRender()
+  }
+
+  prevWeek() {
+    this.currentDate.setDate(this.currentDate.getDate() - 7)
+    this.fetchEventsAndRender()
+  }
+
+  nextWeek() {
+    this.currentDate.setDate(this.currentDate.getDate() + 7)
+    this.fetchEventsAndRender()
+  }
+
+  // View switching methods
+  setViewMonth() {
+    this.setView('month')
+  }
+
+  setViewWeek() {
+    this.setView('week')
+  }
+
+  setViewList() {
+    this.setView('list')
+  }
+
+  setView(view) {
+    this.currentView = view
+
+    // Update button states
+    if (this.hasMonthBtnTarget) this.monthBtnTarget.classList.toggle('active', view === 'month')
+    if (this.hasWeekBtnTarget) this.weekBtnTarget.classList.toggle('active', view === 'week')
+    if (this.hasListBtnTarget) this.listBtnTarget.classList.toggle('active', view === 'list')
+
+    // Show/hide view containers
+    if (this.hasMonthViewTarget) this.monthViewTarget.style.display = view === 'month' ? 'block' : 'none'
+    if (this.hasWeekViewTarget) this.weekViewTarget.style.display = view === 'week' ? 'block' : 'none'
+    if (this.hasListViewTarget) this.listViewTarget.style.display = view === 'list' ? 'block' : 'none'
+
+    this.renderCurrentView()
+  }
+
+  renderCurrentView() {
+    switch (this.currentView) {
+      case 'week':
+        this.renderWeekView()
+        break
+      case 'list':
+        this.renderListView()
+        break
+      default:
+        this.renderCalendar()
+    }
+  }
+
+  renderWeekView() {
+    if (!this.hasWeekViewTarget) return
+
+    const year = this.currentDate.getFullYear()
+    const month = this.currentDate.getMonth()
+
+    // Get the start of the current week (Sunday)
+    const startOfWeek = new Date(this.currentDate)
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
+
+    // Update title to show week range
+    const endOfWeek = new Date(startOfWeek)
+    endOfWeek.setDate(endOfWeek.getDate() + 6)
+
+    const startStr = startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    const endStr = endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    this.currentMonthTarget.textContent = `${startStr} - ${endStr}`
+
+    // Build week view HTML
+    let html = '<div class="week-view-header">'
+    html += '<div class="week-time-gutter"></div>'
+
+    const today = new Date()
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek)
+      day.setDate(day.getDate() + i)
+      const isToday = day.toDateString() === today.toDateString()
+      html += `<div class="week-day-header ${isToday ? 'today' : ''}">
+        <span class="week-day-name">${this.shortDayNames[i]}</span>
+        <span class="week-day-number">${day.getDate()}</span>
+      </div>`
+    }
+    html += '</div>'
+
+    html += '<div class="week-view-body">'
+
+    // Time slots from 6 AM to 11 PM
+    for (let hour = 6; hour < 24; hour++) {
+      const displayHour = hour === 0 ? 12 : (hour > 12 ? hour - 12 : hour)
+      const ampm = hour < 12 ? 'AM' : 'PM'
+
+      html += '<div class="week-time-row">'
+      html += `<div class="week-time-label">${displayHour} ${ampm}</div>`
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const day = new Date(startOfWeek)
+        day.setDate(day.getDate() + dayIndex)
+        const isToday = day.toDateString() === today.toDateString()
+
+        // Find events for this hour
+        const dayEvents = this.events.filter(event => {
+          const eventDate = new Date(event.start)
+          return eventDate.getDate() === day.getDate() &&
+                 eventDate.getMonth() === day.getMonth() &&
+                 eventDate.getFullYear() === day.getFullYear() &&
+                 eventDate.getHours() === hour
+        })
+
+        html += `<div class="week-time-cell ${isToday ? 'today' : ''}" data-date="${day.toISOString().split('T')[0]}" data-hour="${hour}">`
+        dayEvents.forEach(event => {
+          html += `<div class="week-event event-type-${event.eventType || 'social'}" data-event-id="${event.id}">
+            <span class="week-event-title">${event.title}</span>
+          </div>`
+        })
+        html += '</div>'
+      }
+      html += '</div>'
+    }
+
+    html += '</div>'
+
+    this.weekViewTarget.innerHTML = html
+
+    // Add click handlers for events
+    this.weekViewTarget.querySelectorAll('.week-event').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation()
+        const eventId = el.dataset.eventId
+        const event = this.events.find(ev => String(ev.id) === String(eventId))
+        if (event) this.openEventModal(event)
+      })
+    })
+
+    // Add click handlers for cells to add events
+    this.weekViewTarget.querySelectorAll('.week-time-cell').forEach(el => {
+      el.addEventListener('click', () => {
+        const date = el.dataset.date
+        this.openAddEventModal(date)
+      })
+    })
+  }
+
+  renderListView() {
+    if (!this.hasListViewTarget) return
+
+    const year = this.currentDate.getFullYear()
+    const month = this.currentDate.getMonth()
+
+    // Update title
+    this.currentMonthTarget.textContent = `${this.monthNames[month]} ${year}`
+
+    // Sort events by date
+    const sortedEvents = [...this.events].sort((a, b) => new Date(a.start) - new Date(b.start))
+
+    // Group events by date
+    const eventsByDate = {}
+    sortedEvents.forEach(event => {
+      const dateKey = new Date(event.start).toDateString()
+      if (!eventsByDate[dateKey]) {
+        eventsByDate[dateKey] = []
+      }
+      eventsByDate[dateKey].push(event)
+    })
+
+    let html = '<div class="list-view-container">'
+
+    if (Object.keys(eventsByDate).length === 0) {
+      html += '<div class="list-empty"><p>No events this month</p></div>'
+    } else {
+      Object.keys(eventsByDate).forEach(dateKey => {
+        const date = new Date(dateKey)
+        const dateStr = date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric'
+        })
+
+        const isToday = date.toDateString() === new Date().toDateString()
+
+        html += `<div class="list-date-group ${isToday ? 'today' : ''}">`
+        html += `<div class="list-date-header">${dateStr}</div>`
+
+        eventsByDate[dateKey].forEach(event => {
+          const eventTime = new Date(event.start).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit'
+          })
+
+          html += `<div class="list-event-item event-type-${event.eventType || 'social'}" data-event-id="${event.id}">
+            <div class="list-event-time">${eventTime}</div>
+            <div class="list-event-content">
+              <div class="list-event-title">${event.title}</div>
+              ${event.location ? `<div class="list-event-location">${event.location}</div>` : ''}
+            </div>
+          </div>`
+        })
+
+        html += '</div>'
+      })
+    }
+
+    html += '</div>'
+
+    this.listViewTarget.innerHTML = html
+
+    // Add click handlers
+    this.listViewTarget.querySelectorAll('.list-event-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const eventId = el.dataset.eventId
+        const event = this.events.find(ev => String(ev.id) === String(eventId))
+        if (event) this.openEventModal(event)
+      })
+    })
   }
 
   openEventModal(event) {

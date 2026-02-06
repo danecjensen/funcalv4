@@ -29,13 +29,13 @@
       </div>
     </div>
     <div class="view-toggle">
-      <button class="active">Month</button>
-      <button>Week</button>
-      <button>List</button>
+      <button class="active" data-action="click->demo-calendar#setViewMonth" data-demo-calendar-target="monthBtn">Month</button>
+      <button data-action="click->demo-calendar#setViewWeek" data-demo-calendar-target="weekBtn">Week</button>
+      <button data-action="click->demo-calendar#setViewList" data-demo-calendar-target="listBtn">List</button>
     </div>
   </div>
 
-  <div class="calendar-grid">
+  <div class="calendar-grid" data-demo-calendar-target="monthView">
     <div class="calendar-weekdays">
       <div class="weekday">Sun</div>
       <div class="weekday">Mon</div>
@@ -47,6 +47,9 @@
     </div>
     <div class="calendar-days" data-demo-calendar-target="calendarDays"></div>
   </div>
+
+  <div class="calendar-week-view" data-demo-calendar-target="weekView" style="display: none;"></div>
+  <div class="calendar-list-view" data-demo-calendar-target="listView" style="display: none;"></div>
 </div>
 
 <!-- Published Demo Calendars -->

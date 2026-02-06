@@ -28,8 +28,11 @@ end
     end
   end
 
-  # Timeline (root)
-  root to: "posts#index"
+  # Root - Demo Calendar
+  root to: "demo/calendars#show"
+
+  # Timeline (posts)
+  get "timeline", to: "posts#index", as: :timeline
 
   # Posts with nested comments and likes
   resources :posts do

@@ -14,26 +14,35 @@ class SpriteClient
       timeout: timeout
     )
 
-    parse_exec_response(response)
+    # API returns raw stdout as application/octet-stream
+    {
+      stdout: response.body.to_s,
+      stderr: "",
+      exit_code: response.success? ? 0 : response.code
+    }
+  rescue HTTParty::Error, Net::OpenTimeout, Net::ReadTimeout, SocketError => e
+    { stdout: "", stderr: "Request failed: #{e.message}", exit_code: -1 }
   end
 
-  def create_checkpoint(label)
+  def create_checkpoint(comment)
     response = HTTParty.post(
-      "#{BASE_URL}/sprites/#{@sprite_name}/checkpoints",
+      "#{BASE_URL}/sprites/#{@sprite_name}/checkpoint",
       headers: headers.merge("Content-Type" => "application/json"),
-      body: { label: label }.to_json
+      body: { comment: comment }.to_json,
+      timeout: 120
     )
 
-    parse_json_response(response)
+    parse_streamed_response(response)
   end
 
   def restore_checkpoint(checkpoint_id)
     response = HTTParty.post(
       "#{BASE_URL}/sprites/#{@sprite_name}/checkpoints/#{checkpoint_id}/restore",
-      headers: headers
+      headers: headers,
+      timeout: 120
     )
 
-    parse_json_response(response)
+    parse_streamed_response(response)
   end
 
   def list_checkpoints
@@ -42,7 +51,7 @@ class SpriteClient
       headers: headers
     )
 
-    parse_json_response(response)
+    response.parsed_response
   end
 
   private
@@ -51,18 +60,21 @@ class SpriteClient
     { "Authorization" => "Bearer #{@token}" }
   end
 
-  def parse_exec_response(response)
-    data = response.parsed_response
-    {
-      stdout: data["stdout"].to_s,
-      stderr: data["stderr"].to_s,
-      exit_code: data["exit_code"] || response.code
-    }
-  rescue StandardError => e
-    { stdout: "", stderr: "Failed to parse response: #{e.message}", exit_code: -1 }
-  end
+  def parse_streamed_response(response)
+    # API returns newline-delimited JSON events
+    lines = response.body.to_s.lines.map(&:strip).reject(&:empty?)
+    last_event = lines.reverse.find { |l| l.start_with?("{") }
+    return {} unless last_event
 
-  def parse_json_response(response)
-    response.parsed_response
+    data = JSON.parse(last_event)
+    # Extract checkpoint ID from the "complete" event data
+    if data["data"]&.match?(/v\d+/)
+      id = data["data"][/v\d+/]
+      { "id" => id, "data" => data["data"] }
+    else
+      data
+    end
+  rescue JSON::ParserError
+    { "data" => response.body.to_s }
   end
 end

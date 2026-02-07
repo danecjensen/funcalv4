@@ -4,6 +4,8 @@ class FeedbackJob < ApplicationJob
   retry_on StandardError, wait: :polynomially_longer, attempts: 2
   discard_on ActiveRecord::RecordNotFound
 
+  SPRITE_PREAMBLE = "source ~/.bashrc && cd /home/sprite/funcalv4".freeze
+
   def perform(feedback_id)
     @feedback = Feedback.find(feedback_id)
     @log = []
@@ -18,37 +20,27 @@ class FeedbackJob < ApplicationJob
     log("Checkpoint created: #{checkpoint_id}")
 
     # 2. Pull latest code
-    pull_result = exec_logged("cd /home/sprite/funcalv4 && git fetch origin && git reset --hard origin/master")
-    raise "Git pull failed (exit #{pull_result[:exit_code]})" unless pull_result[:exit_code] == 0
+    exec_logged!("#{SPRITE_PREAMBLE} && git fetch origin && git reset --hard origin/master && echo SUCCESS")
 
     # 3. Run Claude Code with the feedback
     prompt = @feedback.feedback_text.gsub("'", "'\\''")
-    claude_result = exec_logged(
-      "cd /home/sprite/funcalv4 && claude -p '#{prompt}' --allowedTools 'Edit,Bash,Read' --output-format text",
+    exec_logged(
+      "#{SPRITE_PREAMBLE} && claude -p '#{prompt}' --allowedTools 'Edit,Bash,Read' --output-format text",
       timeout: 900
     )
-    log("Claude exit code: #{claude_result[:exit_code]}")
 
     # 4. Commit changes (skip if nothing changed)
-    exec_logged("cd /home/sprite/funcalv4 && git add -A")
-    commit_result = exec_logged(
-      "cd /home/sprite/funcalv4 && git diff --cached --quiet || git commit -m 'Feedback ##{feedback_id}: #{@feedback.feedback_text.truncate(72)}'"
-    )
+    exec_logged("#{SPRITE_PREAMBLE} && git add -A && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Feedback ##{feedback_id}: #{@feedback.feedback_text.truncate(72)}')")
 
     # 5. Push to origin
-    push_result = exec_logged("cd /home/sprite/funcalv4 && git push origin master")
-    raise "Git push failed (exit #{push_result[:exit_code]})" unless push_result[:exit_code] == 0
+    exec_logged!("#{SPRITE_PREAMBLE} && git push origin master && echo PUSH_SUCCESS")
 
     # 6. Get commit SHA
-    sha_result = exec_logged("cd /home/sprite/funcalv4 && git rev-parse HEAD")
-    commit_sha = sha_result[:stdout].strip
+    sha_result = exec_logged("#{SPRITE_PREAMBLE} && git rev-parse HEAD")
+    commit_sha = sha_result[:stdout].strip.lines.last&.strip
 
     # 7. Deploy to Fly.io
-    deploy_result = exec_logged(
-      "cd /home/sprite/funcalv4 && flyctl deploy --app funcalv4 --remote-only --strategy immediate --ha=false",
-      timeout: 600
-    )
-    raise "Deploy failed (exit #{deploy_result[:exit_code]})" unless deploy_result[:exit_code] == 0
+    exec_logged!("#{SPRITE_PREAMBLE} && flyctl deploy --app funcalv4 --remote-only --strategy immediate --ha=false && echo DEPLOY_SUCCESS", timeout: 600)
 
     # 8. Mark success
     @feedback.update!(
@@ -76,8 +68,16 @@ class FeedbackJob < ApplicationJob
   def exec_logged(command, timeout: 600)
     log("$ #{command}")
     result = @client.exec(command, timeout: timeout)
-    log("stdout: #{result[:stdout]}") if result[:stdout].present?
-    log("stderr: #{result[:stderr]}") if result[:stderr].present?
+    log("output: #{result[:stdout]}") if result[:stdout].present?
+    result
+  end
+
+  # Like exec_logged but raises if the output doesn't contain the expected SUCCESS marker
+  def exec_logged!(command, timeout: 600)
+    result = exec_logged(command, timeout: timeout)
+    unless result[:stdout]&.include?("SUCCESS")
+      raise "Command failed: #{command.truncate(100)}\nOutput: #{result[:stdout].to_s.truncate(500)}"
+    end
     result
   end
 

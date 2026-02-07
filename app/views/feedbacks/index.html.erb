@@ -1,0 +1,48 @@
+<div class="container py-4">
+  <h2>Feedback Deploy</h2>
+  <p class="text-muted">Submit feedback to trigger an automated code change and deploy.</p>
+
+  <%= form_with url: feedbacks_path, method: :post, class: "mb-4", data: { turbo: true } do |f| %>
+    <div class="mb-3">
+      <%= f.text_area :feedback_text, class: "form-control", rows: 4, placeholder: "Describe the change you'd like to see...", name: "feedback[feedback_text]" %>
+    </div>
+    <%= hidden_field_tag "feedback[submitted_by]", current_user&.email || "web" %>
+    <%= f.submit "Submit Feedback", class: "btn btn-primary" %>
+  <% end %>
+
+  <h4>History</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Feedback</th>
+        <th>Status</th>
+        <th>Submitted By</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @feedbacks.each do |feedback| %>
+        <tr>
+          <td><%= feedback.id %></td>
+          <td><%= truncate(feedback.feedback_text, length: 80) %></td>
+          <td>
+            <% badge_class = case feedback.status
+              when "pending" then "bg-secondary"
+              when "running" then "bg-info"
+              when "success" then "bg-success"
+              when "failed" then "bg-danger"
+              when "reverted" then "bg-warning"
+              else "bg-secondary"
+            end %>
+            <span class="badge <%= badge_class %>"><%= feedback.status %></span>
+          </td>
+          <td><%= feedback.submitted_by %></td>
+          <td><%= time_ago_in_words(feedback.created_at) %> ago</td>
+          <td><%= link_to "View", feedback_path(feedback), class: "btn btn-sm btn-outline-primary" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_06_101010) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -150,6 +150,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_06_101010) do
     t.index ["occurs_at"], name: "index_events_on_occurs_at_gist", using: :gist
     t.index ["post_id"], name: "index_events_on_post_id"
     t.index ["source_name", "source_id"], name: "index_events_on_source_name_and_source_id", unique: true, where: "((source_name IS NOT NULL) AND (source_id IS NOT NULL))"
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.text "feedback_text", null: false
+    t.string "submitted_by"
+    t.string "status", default: "pending", null: false
+    t.text "agent_log"
+    t.string "commit_sha"
+    t.string "checkpoint_id"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|

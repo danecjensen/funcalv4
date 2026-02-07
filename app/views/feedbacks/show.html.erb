@@ -1,0 +1,71 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h2>Feedback #<%= @feedback.id %></h2>
+    <%= link_to "Back to list", feedbacks_path, class: "btn btn-outline-secondary" %>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Feedback</h5>
+      <p><%= @feedback.feedback_text %></p>
+
+      <div class="row">
+        <div class="col-md-4">
+          <strong>Status:</strong>
+          <% badge_class = case @feedback.status
+            when "pending" then "bg-secondary"
+            when "running" then "bg-info"
+            when "success" then "bg-success"
+            when "failed" then "bg-danger"
+            when "reverted" then "bg-warning"
+            else "bg-secondary"
+          end %>
+          <span class="badge <%= badge_class %>"><%= @feedback.status %></span>
+        </div>
+        <div class="col-md-4">
+          <strong>Submitted by:</strong> <%= @feedback.submitted_by || "—" %>
+        </div>
+        <div class="col-md-4">
+          <strong>Created:</strong> <%= @feedback.created_at.strftime("%b %-d, %Y %l:%M %p") %>
+        </div>
+      </div>
+
+      <% if @feedback.started_at || @feedback.completed_at %>
+        <div class="row mt-2">
+          <div class="col-md-4">
+            <strong>Started:</strong> <%= @feedback.started_at&.strftime("%l:%M:%S %p") || "—" %>
+          </div>
+          <div class="col-md-4">
+            <strong>Completed:</strong> <%= @feedback.completed_at&.strftime("%l:%M:%S %p") || "—" %>
+          </div>
+          <% if @feedback.started_at && @feedback.completed_at %>
+            <div class="col-md-4">
+              <strong>Duration:</strong> <%= distance_of_time_in_words(@feedback.started_at, @feedback.completed_at) %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @feedback.commit_sha.present? %>
+        <div class="mt-2">
+          <strong>Commit:</strong>
+          <%= link_to @feedback.commit_sha[0..7], "https://github.com/danecjensen/funcalv4/commit/#{@feedback.commit_sha}", target: "_blank", class: "font-monospace" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-4">
+    <% if @feedback.status == "failed" %>
+      <%= button_to "Retry", retry_feedback_path(@feedback), method: :post, class: "btn btn-warning" %>
+    <% end %>
+    <% if @feedback.checkpoint_id.present? && @feedback.status == "success" %>
+      <%= button_to "Revert", revert_feedback_path(@feedback), method: :post, class: "btn btn-danger", data: { turbo_confirm: "Are you sure you want to revert this change?" } %>
+    <% end %>
+  </div>
+
+  <% if @feedback.agent_log.present? %>
+    <h4>Agent Log</h4>
+    <pre class="bg-dark text-light p-3 rounded" style="max-height: 600px; overflow-y: auto; font-size: 0.85rem;"><%= @feedback.agent_log %></pre>
+  <% end %>
+</div>

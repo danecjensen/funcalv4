@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_URL="${FUNCALV4_URL:-https://funcalv4.fly.dev}"
+TOKEN="${FEEDBACK_AUTH_TOKEN:?Set FEEDBACK_AUTH_TOKEN}"
+
+if [ -z "${1:-}" ]; then
+  echo "Usage: bin/feedback \"Your feedback text here\""
+  exit 1
+fi
+
+curl -s -X POST "$APP_URL/feedbacks" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"feedback\":{\"feedback_text\":$(echo "$1" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'),\"submitted_by\":\"$(whoami)\"}}"

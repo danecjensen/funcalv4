@@ -94,6 +94,14 @@ end
   resources :notifications, only: [:index]
   resources :announcements, only: [:index]
 
+  # Feedbacks (feedback-driven deploy)
+  resources :feedbacks, only: [:index, :show, :create] do
+    member do
+      post :revert
+      post :retry
+    end
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 

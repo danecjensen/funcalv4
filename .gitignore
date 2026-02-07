@@ -44,3 +44,6 @@
 
 # Playwright MCP artifacts
 /.playwright-mcp/
+
+# Screenshots from browser testing
+*.png

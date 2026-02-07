@@ -28,7 +28,11 @@ class CalendarConnectionsController < ApplicationController
       import_enabled: true
     )
 
-    IcalImportJob.perform_later(calendar.id)
+    begin
+      IcalImportJob.perform_later(calendar.id)
+    rescue Redis::CannotConnectError
+      IcalImportJob.perform_now(calendar.id)
+    end
     redirect_to profile_path, notice: "#{name} connected. Events are being imported."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to calendar_connections_path, alert: e.record.errors.full_messages.join(", ")

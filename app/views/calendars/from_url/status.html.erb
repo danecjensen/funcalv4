@@ -1,0 +1,50 @@
+<div class="from-url-container"
+     data-controller="from-url"
+     data-from-url-poll-url-value="<%= @poll_url %>"
+     data-from-url-calendar-url-value="<%= @calendar_url %>">
+
+  <div class="from-url-card from-url-status-card">
+    <div class="from-url-header">
+      <h2 data-from-url-target="heading">Extracting Events...</h2>
+      <p class="from-url-domain" data-from-url-target="subtitle">
+        From <strong><%= URI.parse(@calendar.import_url).host rescue @calendar.import_url %></strong>
+      </p>
+    </div>
+
+    <!-- Loading State -->
+    <div data-from-url-target="loading" class="extraction-loading">
+      <div class="extraction-spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="extraction-loading-text">Scanning page for events...</p>
+      <div class="extraction-progress">
+        <div class="extraction-progress-bar" data-from-url-target="progressBar"></div>
+      </div>
+      <p class="extraction-timer-text">This usually takes <strong>15-20 seconds</strong></p>
+    </div>
+
+    <!-- Events List -->
+    <div data-from-url-target="eventsList" class="extraction-events-list" style="display: none;"></div>
+
+    <!-- Complete State -->
+    <div data-from-url-target="complete" class="extraction-complete" style="display: none;">
+      <div class="extraction-complete-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p class="extraction-complete-text">
+        Found <strong data-from-url-target="eventCount">0</strong> events
+      </p>
+      <a href="<%= @calendar_url %>" class="btn-custom btn-custom-primary" data-from-url-target="viewCalendarBtn">
+        View Calendar
+      </a>
+    </div>
+
+    <!-- Error State -->
+    <div data-from-url-target="error" class="extraction-error" style="display: none;">
+      <p class="extraction-error-text" data-from-url-target="errorMessage">Something went wrong.</p>
+      <%= link_to "Try Again", new_calendars_from_url_path(url: @calendar.import_url, prompt: @calendar.extraction_prompt), class: "btn-custom btn-custom-secondary" %>
+    </div>
+  </div>
+</div>

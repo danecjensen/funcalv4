@@ -30,3 +30,9 @@ application.register("demo-calendar", DemoCalendarController)
 
 import AppleWizardController from "./apple_wizard_controller"
 application.register("apple-wizard", AppleWizardController)
+
+import FromUrlController from "./from_url_controller"
+application.register("from-url", FromUrlController)
+
+import FromUrlFormController from "./from_url_form_controller"
+application.register("from-url-form", FromUrlFormController)

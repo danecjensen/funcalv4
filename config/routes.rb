@@ -45,6 +45,14 @@ end
     resource :rsvp, controller: "event_rsvps", only: [:create, :destroy]
   end
 
+  # Calendar from URL extraction
+  namespace :calendars do
+    resource :from_url, only: [:new, :create], controller: "from_url" do
+      get :status
+      get :poll
+    end
+  end
+
   # Calendar
   resources :calendar, only: [:index, :show, :create, :edit, :update] do
     collection do

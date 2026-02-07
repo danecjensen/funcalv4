@@ -52,6 +52,23 @@
   <div class="calendar-list-view" data-demo-calendar-target="listView" style="display: none;"></div>
 </div>
 
+<!-- Import from URL -->
+<div class="demo-calendars-section">
+  <h3>Import Events from Any Website</h3>
+  <p class="demo-section-subtitle">Paste a URL and tell us what events you're looking for.</p>
+  <form action="<%= new_calendars_from_url_path %>" method="get" class="from-url-mini-form">
+    <div class="from-url-mini-fields">
+      <input type="url" name="url" placeholder="https://example.com/events" required class="from-url-mini-input">
+      <input type="text" name="prompt" placeholder="Live music events this month" class="from-url-mini-input">
+    </div>
+    <% if user_signed_in? %>
+      <button type="submit" class="btn-custom btn-custom-primary from-url-mini-btn">Extract Events</button>
+    <% else %>
+      <%= link_to "Sign in to Extract Events", new_user_session_path, class: "btn-custom btn-custom-secondary from-url-mini-btn" %>
+    <% end %>
+  </form>
+</div>
+
 <!-- Published Demo Calendars -->
 <% if @demo_calendars.present? %>
 <div class="demo-calendars-section">

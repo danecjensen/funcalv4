@@ -1,0 +1,51 @@
+<div class="from-url-container" data-controller="from-url-form">
+  <div class="from-url-card">
+    <div class="from-url-header">
+      <div class="from-url-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <h2 data-from-url-form-target="heading">Import Events from URL</h2>
+      <p data-from-url-form-target="subtitle">Paste a link to any events page and we'll extract the events for you.</p>
+    </div>
+
+    <!-- Form -->
+    <div data-from-url-form-target="formContent">
+      <%= form_tag calendars_from_url_path, method: :post, class: "from-url-form", data: { action: "submit->from-url-form#submit" } do %>
+        <div class="from-url-field">
+          <label for="url">Website URL</label>
+          <input type="url" name="url" id="url" value="<%= @url %>" placeholder="https://example.com/events" required autofocus>
+        </div>
+
+        <div class="from-url-field">
+          <label for="prompt">What events are you looking for?</label>
+          <textarea name="prompt" id="prompt" rows="2" placeholder="e.g. Live music events, tech meetups, community gatherings..." required><%= @prompt %></textarea>
+        </div>
+
+        <div class="from-url-field from-url-optional">
+          <label for="name">Calendar name <span class="optional-label">(optional)</span></label>
+          <input type="text" name="name" id="name" placeholder="Auto-generated from URL">
+        </div>
+
+        <button type="submit" class="btn-custom btn-custom-primary from-url-submit">
+          Extract Events
+        </button>
+      <% end %>
+    </div>
+
+    <!-- Loading overlay (hidden until submit) -->
+    <div data-from-url-form-target="loading" class="extraction-loading" style="display: none;">
+      <div class="extraction-spinner">
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="extraction-loading-text">Extracting events...</p>
+      <div class="extraction-progress">
+        <div class="extraction-progress-bar" data-from-url-form-target="progressBar"></div>
+      </div>
+      <p class="extraction-timer-text">This usually takes <strong>15-20 seconds</strong></p>
+    </div>
+  </div>
+</div>

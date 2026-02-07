@@ -143,7 +143,11 @@ class EventCreationService
 
   def build_scraped_event
     # Direct calendar event for scraped content (no Post)
-    calendar = find_or_create_calendar
+    calendar = if @params[:calendar_id].present?
+      Calendar.find(@params[:calendar_id])
+    else
+      find_or_create_calendar
+    end
     calendar.events.build(event_attributes.merge(
       source_name: @params[:source_name],
       source_id: generate_source_id,

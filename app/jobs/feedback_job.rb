@@ -25,9 +25,9 @@ class FeedbackJob < ApplicationJob
     save_log!
 
     # 3. Run Claude Code with the feedback
-    prompt = @feedback.feedback_text.gsub("'", "'\\''")
+    prompt = Shellwords.shellescape(@feedback.feedback_text)
     exec_logged(
-      "#{SPRITE_PREAMBLE} && claude -p '#{prompt}' --allowedTools 'Edit,Bash,Read' --output-format text",
+      "#{SPRITE_PREAMBLE} && claude -p #{prompt} --allowedTools 'Edit,Bash,Read' --output-format text",
       timeout: 900
     )
     save_log!
@@ -77,10 +77,10 @@ class FeedbackJob < ApplicationJob
     result
   end
 
-  # Like exec_logged but raises if the output doesn't contain the expected SUCCESS marker
+  # Like exec_logged but raises if the output doesn't end with a SUCCESS marker
   def exec_logged!(command, timeout: 600)
     result = exec_logged(command, timeout: timeout)
-    unless result[:stdout]&.include?("SUCCESS")
+    unless result[:stdout].to_s.strip.lines.last&.strip&.match?(/SUCCESS\z/)
       raise "Command failed: #{command.truncate(100)}\nOutput: #{result[:stdout].to_s.truncate(500)}"
     end
     result

@@ -7,12 +7,11 @@ class SpriteClient
   end
 
   def exec(command, timeout: 600)
-    response = HTTParty.post(
-      "#{BASE_URL}/sprites/#{@sprite_name}/exec",
-      headers: headers,
-      query: { cmd: command },
-      timeout: timeout
-    )
+    # Sprites API expects repeated cmd params: cmd=bash&cmd=-c&cmd=<command>
+    query_string = "cmd=bash&cmd=-c&cmd=#{URI.encode_www_form_component(command)}"
+    url = "#{BASE_URL}/sprites/#{@sprite_name}/exec?#{query_string}"
+
+    response = HTTParty.post(url, headers: headers, timeout: timeout)
 
     # API returns raw stdout as application/octet-stream
     {

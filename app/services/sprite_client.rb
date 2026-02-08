@@ -13,9 +13,12 @@ class SpriteClient
 
     response = HTTParty.post(url, headers: headers, timeout: timeout)
 
-    # API returns raw stdout as application/octet-stream
+    # API may return binary-framed data; strip null bytes and non-UTF8
+    body = response.body.to_s.delete("\x00")
+    body = body.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+
     {
-      stdout: response.body.to_s,
+      stdout: body,
       stderr: "",
       exit_code: response.success? ? 0 : response.code
     }

@@ -18,9 +18,11 @@ class FeedbackJob < ApplicationJob
     checkpoint_id = checkpoint&.dig("id")
     @feedback.update!(checkpoint_id: checkpoint_id) if checkpoint_id
     log("Checkpoint created: #{checkpoint_id}")
+    save_log!
 
     # 2. Pull latest code
     exec_logged!("#{SPRITE_PREAMBLE} && git fetch origin && git reset --hard origin/master && echo SUCCESS")
+    save_log!
 
     # 3. Run Claude Code with the feedback
     prompt = @feedback.feedback_text.gsub("'", "'\\''")
@@ -28,12 +30,15 @@ class FeedbackJob < ApplicationJob
       "#{SPRITE_PREAMBLE} && claude -p '#{prompt}' --allowedTools 'Edit,Bash,Read' --output-format text",
       timeout: 900
     )
+    save_log!
 
     # 4. Commit changes (skip if nothing changed)
     exec_logged("#{SPRITE_PREAMBLE} && git add -A && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Feedback ##{feedback_id}: #{@feedback.feedback_text.truncate(72)}')")
+    save_log!
 
     # 5. Push to origin
     exec_logged!("#{SPRITE_PREAMBLE} && git push origin master && echo PUSH_SUCCESS")
+    save_log!
 
     # 6. Get commit SHA
     sha_result = exec_logged("#{SPRITE_PREAMBLE} && git rev-parse HEAD")
@@ -83,5 +88,9 @@ class FeedbackJob < ApplicationJob
 
   def log(message)
     @log << "[#{Time.current.iso8601}] #{message}"
+  end
+
+  def save_log!
+    @feedback.update_column(:agent_log, @log.join("\n"))
   end
 end

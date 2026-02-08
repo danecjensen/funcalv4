@@ -1,3 +1,9 @@
+<% if @feedbacks.any? { |f| f.status.in?(%w[pending running]) } %>
+  <% content_for :head do %>
+    <meta http-equiv="refresh" content="5">
+  <% end %>
+<% end %>
+
 <div class="container py-4">
   <h2>Feedback Deploy</h2>
   <p class="text-muted">Submit feedback to trigger an automated code change and deploy.</p>

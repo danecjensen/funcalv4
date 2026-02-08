@@ -1,8 +1,45 @@
+<% if @feedback.status.in?(%w[pending running]) %>
+  <% content_for :head do %>
+    <meta http-equiv="refresh" content="5">
+  <% end %>
+<% end %>
+
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-start mb-3">
     <h2>Feedback #<%= @feedback.id %></h2>
     <%= link_to "Back to list", feedbacks_path, class: "btn btn-outline-secondary" %>
   </div>
+
+  <% if @feedback.status.in?(%w[pending running]) %>
+    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+      <div class="spinner-border spinner-border-sm me-2" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div>
+        <strong><%= @feedback.status == "pending" ? "Queued" : "Running" %></strong>
+        &mdash;
+        <% last_step = @feedback.agent_log.to_s.lines.last&.strip %>
+        <% if last_step.blank? %>
+          Waiting for worker to pick up job...
+        <% elsif last_step.include?("Checkpoint") %>
+          Creating checkpoint...
+        <% elsif last_step.include?("git fetch") || last_step.include?("git reset") %>
+          Pulling latest code...
+        <% elsif last_step.include?("claude") %>
+          Running Claude Code...
+        <% elsif last_step.include?("git add") || last_step.include?("git commit") %>
+          Committing changes...
+        <% elsif last_step.include?("git push") %>
+          Pushing to origin...
+        <% elsif last_step.include?("flyctl deploy") %>
+          Deploying to Fly.io...
+        <% else %>
+          Working...
+        <% end %>
+        <small class="text-muted ms-2">(auto-refreshing every 5s)</small>
+      </div>
+    </div>
+  <% end %>
 
   <div class="card mb-4">
     <div class="card-body">
@@ -66,6 +103,12 @@
 
   <% if @feedback.agent_log.present? %>
     <h4>Agent Log</h4>
-    <pre class="bg-dark text-light p-3 rounded" style="max-height: 600px; overflow-y: auto; font-size: 0.85rem;"><%= @feedback.agent_log %></pre>
+    <pre id="agent-log" class="bg-dark text-light p-3 rounded" style="max-height: 600px; overflow-y: auto; font-size: 0.85rem;"><%= @feedback.agent_log %></pre>
+    <% if @feedback.status.in?(%w[pending running]) %>
+      <script>
+        var log = document.getElementById('agent-log');
+        if (log) log.scrollTop = log.scrollHeight;
+      </script>
+    <% end %>
   <% end %>
 </div>

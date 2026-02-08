@@ -77,10 +77,10 @@ class FeedbackJob < ApplicationJob
     result
   end
 
-  # Like exec_logged but raises if the output doesn't end with a SUCCESS marker
+  # Like exec_logged but raises if no line in the output ends with a SUCCESS marker
   def exec_logged!(command, timeout: 600)
     result = exec_logged(command, timeout: timeout)
-    unless result[:stdout].to_s.strip.lines.last&.strip&.match?(/SUCCESS\z/)
+    unless result[:stdout].to_s.lines.any? { |l| l.strip.end_with?("SUCCESS") }
       raise "Command failed: #{command.truncate(100)}\nOutput: #{result[:stdout].to_s.truncate(500)}"
     end
     result

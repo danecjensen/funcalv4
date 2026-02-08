@@ -33,7 +33,8 @@ class FeedbackJob < ApplicationJob
     save_log!
 
     # 4. Commit changes (skip if nothing changed)
-    exec_logged("#{SPRITE_PREAMBLE} && git add -A && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m 'Feedback ##{feedback_id}: #{@feedback.feedback_text.truncate(72)}')")
+    commit_msg = "Feedback ##{feedback_id}: #{@feedback.feedback_text.truncate(72)}".gsub(/[^a-zA-Z0-9 _\-.:,#]/, "")
+    exec_logged("#{SPRITE_PREAMBLE} && git add -A && (git diff --cached --quiet && echo 'No changes to commit' || git commit -m #{Shellwords.shellescape(commit_msg)})")
     save_log!
 
     # 5. Push to origin
@@ -42,7 +43,7 @@ class FeedbackJob < ApplicationJob
 
     # 6. Get commit SHA
     sha_result = exec_logged("#{SPRITE_PREAMBLE} && git rev-parse HEAD")
-    commit_sha = sha_result[:stdout].strip.lines.last&.strip
+    commit_sha = sha_result[:stdout].scan(/[0-9a-f]{40}/).last
 
     # 7. Deploy to Fly.io
     exec_logged!("#{SPRITE_PREAMBLE} && flyctl deploy --app funcalv4 --remote-only --strategy immediate --ha=false && echo DEPLOY_SUCCESS", timeout: 600)

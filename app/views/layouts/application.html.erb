@@ -56,8 +56,6 @@
       <%= yield %>
     </main>
 
-    <% if user_signed_in? %>
-      <%= render "chat/panel" %>
-    <% end %>
+    <%= render "feedback/panel" %>
   </body>
 </html>

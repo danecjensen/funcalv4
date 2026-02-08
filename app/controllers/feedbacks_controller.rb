@@ -59,7 +59,7 @@ class FeedbacksController < ApplicationController
   end
 
   def feedback_params
-    params.require(:feedback).permit(:feedback_text, :submitted_by)
+    params.require(:feedback).permit(:feedback_text, :submitted_by, :page_url, :page_title)
   end
 
   def authenticate_for_create!

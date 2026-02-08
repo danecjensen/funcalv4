@@ -8,15 +8,16 @@
 
 # Sidekiq Scheduler configuration
 # These jobs run on a schedule
-:schedule:
-  scrape_all_sources:
-    cron: '0 */4 * * *'  # Every 4 hours
-    class: ScrapeAllSourcesJob
-    queue: scrapers
-    description: "Scrape all enabled event sources"
+:scheduler:
+  :schedule:
+    scrape_all_sources:
+      cron: '0 */4 * * *'  # Every 4 hours
+      class: ScrapeAllSourcesJob
+      queue: scrapers
+      description: "Scrape all enabled event sources"
 
-  scheduled_ical_import:
-    cron: '0 * * * *'  # Every hour
-    class: ScheduledIcalImportJob
-    queue: imports
-    description: "Sync all enabled calendar imports (iCal, Google, Apple)"
+    scheduled_ical_import:
+      cron: '0 * * * *'  # Every hour
+      class: ScheduledIcalImportJob
+      queue: imports
+      description: "Sync all enabled calendar imports (iCal, Google, Apple)"

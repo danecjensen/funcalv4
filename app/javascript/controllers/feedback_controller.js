@@ -4,21 +4,29 @@ import { Controller } from "@hotwired/stimulus"
 // Captures page context and submits feedback
 export default class extends Controller {
   static targets = [
-    "messages",
-    "input",
+    "panel",
     "form",
-    "sendButton",
-    "successMessage",
-    "panel"
+    "email",
+    "message",
+    "submitButton",
+    "counter",
+    "content",
+    "success"
   ]
 
   static values = {
-    apiUrl: { type: String },
+    submitUrl: { type: String, default: "/feedbacks" },
     open: { type: Boolean, default: false }
   }
 
   connect() {
+    this.maxLength = 1000
     this.isSubmitting = false
+
+    // Auto-resize textarea
+    if (this.hasMessageTarget) {
+      this.messageTarget.addEventListener('input', () => this.autoResize())
+    }
   }
 
   // Toggle panel visibility
@@ -27,43 +35,106 @@ export default class extends Controller {
     this.panelTarget.classList.toggle("hidden", !this.openValue)
 
     if (this.openValue) {
-      this.inputTarget.focus()
-      this.scrollToBottom()
+      this.showForm()
+      if (this.hasMessageTarget) {
+        this.messageTarget.focus()
+      }
     }
   }
 
   open() {
     this.openValue = true
     this.panelTarget.classList.remove("hidden")
-    this.inputTarget.focus()
-    this.scrollToBottom()
+    this.showForm()
+    if (this.hasMessageTarget) {
+      this.messageTarget.focus()
+    }
   }
 
   close() {
     this.openValue = false
     this.panelTarget.classList.add("hidden")
+
+    // Reset form after closing
+    setTimeout(() => {
+      if (!this.openValue) {
+        this.resetForm()
+      }
+    }, 300)
+  }
+
+  showForm() {
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.remove("hidden")
+    }
+    if (this.hasSuccessTarget) {
+      this.successTarget.classList.add("hidden")
+    }
+    if (this.hasFormTarget) {
+      this.formTarget.classList.remove("hidden")
+    }
+  }
+
+  showSuccess() {
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.add("hidden")
+    }
+    if (this.hasFormTarget) {
+      this.formTarget.classList.add("hidden")
+    }
+    if (this.hasSuccessTarget) {
+      this.successTarget.classList.remove("hidden")
+    }
+
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      this.close()
+    }, 3000)
+  }
+
+  resetForm() {
+    if (this.hasFormTarget) {
+      this.formTarget.reset()
+      this.updateCounter()
+      this.autoResize()
+    }
   }
 
   // Handle form submission
   async submit(event) {
     event.preventDefault()
 
-    const message = this.inputTarget.value.trim()
-    if (!message || this.isSubmitting) return
+    if (this.isSubmitting) return
+
+    const message = this.messageTarget.value.trim()
+    if (!message) {
+      this.messageTarget.focus()
+      return
+    }
+
+    // Validate length
+    if (message.length > this.maxLength) {
+      alert(`Feedback must be ${this.maxLength} characters or less`)
+      return
+    }
 
     this.isSubmitting = true
-    this.sendButtonTarget.disabled = true
+    this.submitButtonTarget.disabled = true
+    this.submitButtonTarget.textContent = "Sending..."
 
     try {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
 
       // Capture page context
       const pageContext = {
-        page_url: window.location.href,
-        page_title: document.title
+        url: window.location.href,
+        path: window.location.pathname,
+        title: document.title,
+        referrer: document.referrer,
+        timestamp: new Date().toISOString()
       }
 
-      const response = await fetch(this.apiUrlValue, {
+      const response = await fetch(this.submitUrlValue, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,9 +143,14 @@ export default class extends Controller {
         },
         body: JSON.stringify({
           feedback: {
-            feedback_text: message,
-            submitted_by: this.getCurrentUserEmail(),
-            ...pageContext
+            email: this.emailTarget.value.trim() || null,
+            message: message,
+            page_url: pageContext.url,
+            page_path: pageContext.path,
+            page_title: pageContext.title,
+            user_agent: navigator.userAgent,
+            screen_size: `${window.screen.width}x${window.screen.height}`,
+            viewport_size: `${window.innerWidth}x${window.innerHeight}`
           }
         })
       })
@@ -85,58 +161,45 @@ export default class extends Controller {
 
       const data = await response.json()
 
-      // Clear input
-      this.inputTarget.value = ""
-
-      // Show success message
-      this.showSuccessMessage()
-
-      // Auto-close after 3 seconds
-      setTimeout(() => {
-        this.close()
-        this.hideSuccessMessage()
-      }, 3000)
+      if (data.success) {
+        this.showSuccess()
+      } else {
+        throw new Error(data.error || "Failed to submit feedback")
+      }
 
     } catch (error) {
-      console.error("Feedback error:", error)
+      console.error("Feedback submission error:", error)
       alert(`Sorry, there was an error submitting your feedback: ${error.message}`)
     } finally {
       this.isSubmitting = false
-      this.sendButtonTarget.disabled = false
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.textContent = "Send Feedback"
     }
   }
 
-  showSuccessMessage() {
-    if (this.hasSuccessMessageTarget) {
-      this.successMessageTarget.classList.remove("hidden")
-      this.scrollToBottom()
+  // Update character counter
+  updateCounter() {
+    if (!this.hasCounterTarget || !this.hasMessageTarget) return
+
+    const length = this.messageTarget.value.length
+    this.counterTarget.textContent = length
+
+    // Visual feedback for character limit
+    if (length > this.maxLength) {
+      this.counterTarget.style.color = "#dc3545"
+    } else if (length > this.maxLength * 0.9) {
+      this.counterTarget.style.color = "#e8a756"
+    } else {
+      this.counterTarget.style.color = ""
     }
   }
 
-  hideSuccessMessage() {
-    if (this.hasSuccessMessageTarget) {
-      this.successMessageTarget.classList.add("hidden")
-    }
-  }
+  // Auto-resize textarea
+  autoResize() {
+    if (!this.hasMessageTarget) return
 
-  scrollToBottom() {
-    this.messagesTarget.scrollTop = this.messagesTarget.scrollHeight
-  }
-
-  // Handle Ctrl+Enter to submit
-  handleKeydown(event) {
-    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault()
-      this.submit(event)
-    }
-  }
-
-  getCurrentUserEmail() {
-    // Try to extract user email from page meta or other sources
-    const userMeta = document.querySelector('meta[name="user-email"]')
-    if (userMeta) {
-      return userMeta.content
-    }
-    return "anonymous"
+    const textarea = this.messageTarget
+    textarea.style.height = 'auto'
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px'
   }
 }

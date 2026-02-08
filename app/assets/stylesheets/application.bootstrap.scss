@@ -2392,6 +2392,114 @@ trix-editor {
 }
 
 // ============================================
+// FEEDBACK FORM SPECIFIC STYLES
+// ============================================
+.feedback-intro {
+  padding: 20px 0;
+}
+
+.feedback-field-group {
+  margin-bottom: 20px;
+}
+
+.feedback-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--chat-ink-soft);
+  margin-bottom: 8px;
+}
+
+.feedback-input,
+.feedback-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--chat-ink);
+  background: white;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: var(--chat-ink-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--chat-amber);
+    box-shadow: 0 0 0 3px rgba(232, 167, 86, 0.15);
+  }
+}
+
+.feedback-textarea {
+  resize: vertical;
+  min-height: 100px;
+  max-height: 200px;
+  line-height: 1.6;
+}
+
+.feedback-counter {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--chat-ink-muted);
+  margin-top: 4px;
+}
+
+.feedback-submit-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.feedback-success {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.feedback-success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #dcfce7 0%, #a7f3d0 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #166534;
+  animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes successBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.feedback-success-text {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--chat-ink);
+  margin-bottom: 8px;
+}
+
+.feedback-success-subtext {
+  font-size: 0.9375rem;
+  color: var(--chat-ink-soft);
+  margin: 0;
+}
+
+// ============================================
 // RESPONSIVE
 // ============================================
 @media (max-width: 480px) {

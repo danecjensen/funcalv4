@@ -19,12 +19,12 @@ class FeedbacksController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to feedbacks_path, notice: "Feedback submitted." }
-        format.json { render json: { id: @feedback.id, status: @feedback.status }, status: :created }
+        format.json { render json: { success: true, id: @feedback.id, status: @feedback.status }, status: :created }
       end
     else
       respond_to do |format|
         format.html { redirect_to feedbacks_path, alert: @feedback.errors.full_messages.join(", ") }
-        format.json { render json: { errors: @feedback.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: { success: false, error: @feedback.errors.full_messages.join(", "), errors: @feedback.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end
@@ -59,7 +59,26 @@ class FeedbacksController < ApplicationController
   end
 
   def feedback_params
-    params.require(:feedback).permit(:feedback_text, :submitted_by, :page_url, :page_title)
+    # Map 'message' to 'feedback_text' if present
+    feedback_data = params.require(:feedback).permit(
+      :feedback_text,
+      :message,
+      :submitted_by,
+      :email,
+      :page_url,
+      :page_path,
+      :page_title,
+      :user_agent,
+      :screen_size,
+      :viewport_size
+    )
+
+    # Use 'message' as 'feedback_text' if feedback_text is not provided
+    if feedback_data[:message].present? && feedback_data[:feedback_text].blank?
+      feedback_data[:feedback_text] = feedback_data[:message]
+    end
+
+    feedback_data
   end
 
   def authenticate_for_create!
